@@ -132,7 +132,7 @@ const Register = () => {
             Sweepo empowers you to offer cutting-edge AI-driven analytics and predictive modeling as part of your service offerings. With Sweepo, agencies can help their clients chat with data, create live charts and graphs, and predict future trends with ease. Sign up now to experience how Sweepo can elevate your agency and drive new revenue opportunities.
         </p>
     </div>
-    </div>
+        </div>
 
     </div>
   )

@@ -1,7 +1,7 @@
 {
-  "name": "primemarket-server",
+  "name": "data-cleaning-server",
   "version": "1.0.0",
-  "description": "PrimeMarket server - A full-stack MERN e-commerce platform backend",
+  "description": "Data Cleaning server - A full-stack MERN data cleaning platform backend",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
     "format": "prettier --write ."
   },
   "keywords": [
-    "e-commerce",
+    "data cleaning",
     "mern",
     "backend"
   ],

@@ -1,5 +1,8 @@
 'use server'
 
+import {axiosPrivate} from "../services/axios.js"
+import { AxiosError } from "axios";
+
 import { z } from "zod";
 
 type RegisterResponse = {
@@ -33,13 +36,20 @@ export const createUser = async (
             lastName: formData.get('lastName') as string,
             email: formData.get('email') as string,
             password: formData.get('password') as string,
+            confirmPassword: formData.get('confirmPassword') as string
+        }
+
+        const {data} = await axiosPrivate.post("/register", { ...inputValues });
+        
+        if (!data) {
+        return { message: "", errors: data.errors || { root: ["Something went wrong. Please try again!"] } };
         }
         
-        console.log(inputValues);
-            
-            return { message: "Registered Successfully" };
+        return data;
 
     } catch (error) {
+
+        
         if (error instanceof z.ZodError) {
             
             return {
@@ -47,6 +57,18 @@ export const createUser = async (
                 errors: error.flatten().fieldErrors,
             };
         }
+
+        if (error instanceof AxiosError) {
+            const data = error.response?.data;
+
+            if (!data?.message) {
+                return {
+                    message: '',
+                    errors: { root: ["Something went wrong. Please try again!"] },
+                };
+            }
+        }
+
         return {
             message: '',
             errors: {root:["Something went wrong. Please try again!"]},
@@ -75,33 +97,49 @@ export const login =  async(
         email: z.string().email('Invalid email address'),
         password: z.string().nonempty('Password is required')
     })
+
     const formValues = {
         email: formData.get('email') as string,
         password: formData.get('password') as string
     }
 
-    try{
+
+    try {
         inputValidation.parse(formValues);
+        
+        const {data} = await axiosPrivate.post("/login", { ...formValues });
+        
+        if (!data) {
+        return { message: "", errors: data.errors || { root: ["Something went wrong. Please try again!"] } };
+        }
+        
+        return data;
 
-                    return{
-                        message:'LoggedIn Succesfully',
-                        isLoggedIn:true,
-                    }
-                    
-    }catch(error){
+    } catch (error) {
 
-        if(error instanceof z.ZodError){
+        
+        if (error instanceof z.ZodError) {
+            
             return {
                 message: '',
-                isLoggedIn:false,
                 errors: error.flatten().fieldErrors,
+            };
+        }
+
+        if (error instanceof AxiosError) {
+            const data = error.response?.data;
+
+            if (!data?.message) {
+                return {
+                    message: '',
+                    errors: { root: ["Something went wrong. Please try again!"] },
+                };
             }
         }
 
         return {
-            message: 'An unexpected error occurred. Please try again later.',
-            isLoggedIn:false,
-            errors: {root:['Something went wrong, Please try again!']}
-        }
+            message: '',
+            errors: {root:["Something went wrong. Please try again!"]},
+        };
     }
 }

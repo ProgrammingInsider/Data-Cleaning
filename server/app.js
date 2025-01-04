@@ -19,20 +19,18 @@ const app = express();
 dotenv.config();
 
 // Routes
-import PublicRoutes from './routes/publicRoutes.js';
-import ProtectedRoutes from './routes/protectedRoutes.js';
-import PrivateRoutes from './routes/privateRoutes.js';
+import publicRoutes from './routes/publicRoutes.js';
+
 
 // Middleware
 import credentials from './middleware/credentials.js';
 import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
 import { privateAuth } from './middleware/privateAuth.js';
-import { protectedAuth } from './middleware/protectedAuth.js';
 
 // Config
 import corsOptions from './config/corsOptions.js';
-import conn from './config/db.js';
+// import conn from './config/db.js';
 
 // Security Middleware
 app.use(helmet());
@@ -54,13 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(credentials);
 app.use(cors(corsOptions));
 
-app.use(
-  '/uploads/products',
-  express.static(path.join(__dirname, 'uploads/products'))
-);
-app.use('/api/v1/ecommerce_portfolio/', PublicRoutes);
-app.use('/api/v1/ecommerce_portfolio/', protectedAuth, ProtectedRoutes);
-app.use('/api/v1/ecommerce_portfolio/', privateAuth, PrivateRoutes);
+app.use('/api/v1/data-cleaning/', publicRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
