@@ -64,7 +64,7 @@ export const createUser = async (
             if (!data?.message) {
                 return {
                     message: '',
-                    errors: { root: ["Something went wrong. Please try again!"] },
+                    errors: { root: [error] },
                 };
             }
         }
