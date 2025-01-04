@@ -64,14 +64,15 @@ export const createUser = async (
             if (!data?.message) {
                 return {
                     message: '',
-                    errors: { root: [error] },
+                    errors: { root: [`${error}`] },
                 };
             }
         }
 
         return {
             message: '',
-            errors: {root:["Something went wrong. Please try again!"]},
+            // errors: {root:["Something went wrong. Please try again!"]},
+            errors: {root:[`${error}`]},
         };
     }
 };
