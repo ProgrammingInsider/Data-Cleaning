@@ -23,7 +23,7 @@
   --color-planning: #FD9E04;
   --color-progress-count: #19181D;
   --color-progress-bg: #3A3A3C;
-  
+
   --color-input-label: #a0a0a0; 
   --color-input-value: #d1d1d1; 
   --color-input-border: #3c3c3c; 
@@ -41,7 +41,7 @@
 
 } */
 
-:root.dark {
+/* :root.dark {
   --color-primary: #1860DC;
   --color-background: #ffffff; 
   --color-primaryButtonText: #ffffff; 
@@ -58,7 +58,7 @@
   --font-heading: "Charter", "Georgia", serif;
   --font-paragraph: "Merriweather", "Georgia", serif;
   --font-ui: "Inter", "Helvetica Neue", "Arial", sans-serif;
-}
+} */
 
 
 body {

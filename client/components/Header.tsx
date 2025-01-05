@@ -2,48 +2,48 @@
 
 import { useGlobalContext } from '@/context/context';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { GiHamburgerMenu } from "react-icons/gi";
-import { MdOutlineToggleOff } from "react-icons/md";
-import { MdOutlineToggleOn } from "react-icons/md";
+// import { MdOutlineToggleOff } from "react-icons/md";
+// import { MdOutlineToggleOn } from "react-icons/md";
 import { useRouter } from 'next/navigation';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoCloseSharp } from "react-icons/io5";
 
 
 const Header = () => {
-    const [isDarkMode, setDarkMode] = useState<boolean>(false)
+    // const [isDarkMode, setDarkMode] = useState<boolean>(false)
     const {userId, setUserId} = useGlobalContext();
     const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
     const route = useRouter();
 
-    useEffect(() => {
+    // useEffect(() => {
         
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    //     const savedTheme = localStorage.getItem('theme');
+    //     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
-            document.documentElement.classList.add('dark');
-            setDarkMode(true);
-        } else {
-            document.documentElement.classList.remove('dark');
-            setDarkMode(false);
-        }
-    }, []);
+    //     if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
+    //         document.documentElement.classList.add('dark');
+    //         setDarkMode(true);
+    //     } else {
+    //         document.documentElement.classList.remove('dark');
+    //         setDarkMode(false);
+    //     }
+    // }, []);
 
     // Toggle theme on button click
-    const toggleTheme = () => {
-        const html = document.documentElement;
-        if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        localStorage.setItem('theme', 'light'); 
-        setDarkMode(false)
-        } else {
-        html.classList.add('dark');
-        localStorage.setItem('theme', 'dark'); 
-        setDarkMode(true)
-        }
-    };
+    // const toggleTheme = () => {
+    //     const html = document.documentElement;
+    //     if (html.classList.contains('dark')) {
+    //     html.classList.remove('dark');
+    //     localStorage.setItem('theme', 'light'); 
+    //     setDarkMode(false)
+    //     } else {
+    //     html.classList.add('dark');
+    //     localStorage.setItem('theme', 'dark'); 
+    //     setDarkMode(true)
+    //     }
+    // };
 
     const handleLogout = async () => {
         try {
@@ -83,13 +83,13 @@ const Header = () => {
                     {userId && <Link title='dashboard' href={"/dashboard"}>
                         <FaCircleUser className='heading text-xl cursor-pointer' />
                     </Link>}
-                    <div className='cursor-pointer'>
+                    {/* <div className='cursor-pointer'>
                     {
                         isDarkMode
                         ?(<MdOutlineToggleOff className='primary text-2xl' onClick={()=>{setDarkMode(false);toggleTheme()}} />)
                         :(<MdOutlineToggleOn className='primary text-2xl' onClick={()=>{setDarkMode(true);toggleTheme()}}/>)
                     }
-                    </div>
+                    </div> */}
                 </nav>
 
             </header>
