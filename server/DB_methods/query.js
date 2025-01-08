@@ -1,21 +1,11 @@
 import pool from "../DB/db.js";
 
-export const queryDb = async (sql) => {
-    try{
-
-        const resp = await new Promise((resolve,reject)=>{
-            pool.query(sql,(err,result)=>{                
-                if(err){
-                    reject(err)
-                }else{    
-                    resolve(result)
-                }
-            })
-        });
-    
-        return resp
-
-    }catch(error){
-        throw error
+export const queryDb = async (sql, params = []) => {
+    try {
+        const [rows] = await pool.query(sql, params);
+        return rows;
+    } catch (error) {
+        console.error("Database Query Error:", error);
+        throw error;
     }
-}
+};

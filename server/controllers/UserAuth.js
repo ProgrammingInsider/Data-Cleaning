@@ -1,120 +1,128 @@
 import { queryDb } from '../DB_methods/query.js';
 import { BadRequestError, ConventionError,UnauthenticatedError, NoContentError, ForbiddenError } from '../errors/index.js';
-import { checkArrayLength } from '../utils/checkArrayLength.js';
 import bcrypt from 'bcryptjs'
 import { tokenService } from '../utils/tokenService.js';
 
 // REGISTER
-export const Register = async(req, res) => {
-    
-    const {firstName,lastName,email,password,confirmPassword} = req.body;
-    
-    if(!firstName || !lastName || !email || !password || !confirmPassword){
-        throw new BadRequestError("Please Provide all require information")
+export const Register = async (req, res, next) => {
+    const { firstName, lastName, email, password, confirmPassword } = req.body;
+
+    // VALIDATE INPUT
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        return next(new BadRequestError("Please provide all required information."));
     }
-    
+
     if (password !== confirmPassword) {
-        throw new BadRequestError('Passwords do not match');
+        return next(new BadRequestError('Passwords do not match.'));
     }
 
-    const existanceSql = `SELECT email FROM user WHERE email = "${email}"`;
+    // CHECK IF USER EXISTS
+    const existanceSql = `SELECT email FROM user WHERE email = ?`;
+    const getResult = await queryDb(existanceSql, [email]);
 
-    const getResult = await queryDb(existanceSql);
-    const isExist = checkArrayLength(getResult);
-
-    if(isExist){
-        throw new ConventionError(`There is a user registration with this ${email} Email`)
-    }else{
-
-        // INSERT QUERY    
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password,salt);
-
-        const insertSql = `INSERT INTO user (email,firstName,lastName,password) VALUES ("${email}","${firstName}","${lastName}","${hashedPassword}")`
-
-        const postResult = await queryDb(insertSql);
-
-        if(postResult.affectedRows){
-            res.status(200).json({status:true, message:`Registered Successfully`}) 
-        }
+    if (getResult.length > 0) {
+        return next(new ConventionError(`User with email ${email} already exists.`));
     }
-}
+
+    // HASH PASSWORD
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // INSERT USER INTO DATABASE
+    const insertSql = `INSERT INTO user (email, firstName, lastName, password) VALUES (?, ?, ?, ?)`;
+    const postResult = await queryDb(insertSql, [email, firstName, lastName, hashedPassword]);
+
+    if (postResult.affectedRows) {
+        return res.status(201).json({ status: true, message: "Registered successfully" });
+    } else {
+        return next(new Error("Failed to register user."));
+    }
+};
 
 // LOGIN
-export const Login = async(req, res) => {
-    const {email,password} = req.body;
-    
+export const Login = async (req, res, next) => {
+    const { email, password } = req.body;
 
-    if(!email || !password){
-        throw new BadRequestError("Please Provide email and password")
+    // VALIDATE INPUT
+    if (!email || !password) {
+        return next(new BadRequestError("Please provide email and password."));
     }
 
-    const sql = `SELECT * FROM user WHERE email = "${email}"`
-    const queryResult = await queryDb(sql);
-    const isExist = checkArrayLength(queryResult);
-        if(isExist){
-            const isMatch = await bcrypt.compare(password,queryResult[0].password)
-    
-                if(isMatch){
+    // CHECK IF USER EXISTS
+    const sql = `SELECT * FROM user WHERE email = ?`;
+    const queryResult = await queryDb(sql, [email]);
 
-                const {email, firstName, lastName} = queryResult[0];
+    if (queryResult.length === 0) {
+        return res.status(200).json({ EmailMatch: false });
+    }
 
-                // create access token
-                const payload = {email, firstName, lastName}
-                const {accessToken, refreshToken} = tokenService(payload)
-                
-                // store refresh token in a database
-                const refreshSql = `UPDATE user SET refreshToken = "${refreshToken}" WHERE email="${email}"`
+    const isMatch = await bcrypt.compare(password, queryResult[0].password);
 
-                
-                
-                await queryDb(refreshSql);
-                
-                res.cookie('dataCleaningJWT', refreshToken, {
-                    httpOnly: true,
-                    maxAge: 3 * 24 * 60 * 60 * 1000,
-                    secure: true,
-                    sameSite: 'None'
-                });
-                
-                
-                res.status(200).json({EmailMatch:true, PasswordMatch:true, payload, accessToken}) 
+    if (isMatch) {
+        const { email, firstName, lastName } = queryResult[0];
 
-                }else{
+        // Create access token
+        const payload = { email, firstName, lastName };
+        const { accessToken, refreshToken } = tokenService(payload);
 
-                res.status(200).json({EmailMatch:true, PasswordMatch:false}) 
-                }
-        }else{
-            res.status(200).json({EmailMatch:false}) 
-        }
-}
+        // Store refresh token in the database
+        const refreshSql = `UPDATE user SET refreshToken = ? WHERE email = ?`;
+        await queryDb(refreshSql, [refreshToken, email]);
+
+        // Set refresh token in cookies
+        res.cookie('dataCleaningJWT', refreshToken, {
+            httpOnly: true,
+            maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+            secure: true,
+            sameSite: 'None',
+        });
+
+        return res.status(200).json({ EmailMatch: true, PasswordMatch: true, payload, accessToken });
+    } else {
+        return res.status(200).json({ EmailMatch: true, PasswordMatch: false });
+    }
+};
 
 // LOGOUT
-export const Logout = async (req,res)=>{
+export const Logout = async (req, res, next) => {
     const cookies = req.cookies;
 
-    console.log(cookies);
-    
-    if(!cookies?.dataCleaningJWT){
-        throw new NoContentError("No Content to send back");
+    // Check if the cookie exists
+    if (!cookies?.dataCleaningJWT) {
+        return next(new NoContentError("No content to send back"));
     }
-    
+
     const refreshToken = cookies.dataCleaningJWT;
-    const sql = `SELECT * FROM user WHERE refreshToken = "${refreshToken}"`;
-    const queryResult = await queryDb(sql);
-    const isExist = checkArrayLength(queryResult);
-    console.log(sql);
-    
-        if(isExist){
-            const sql = `UPDATE user SET refreshToken = null WHERE refreshToken="${refreshToken}"`
-            await queryDb(sql);    
-            res.clearCookie('dataCleaningJWT',{httpOnly:true, secure:true, sameSite:'None'})
-            throw new NoContentError("No Content to send back");    
-        } else{
-            res.clearCookie('dataCleaningJWT',{httpOnly:true, secure:true, sameSite:'None'})
-            throw new NoContentError("No Content to send back");
-        }
-}
+
+    // Check if the refresh token exists in the database
+    const sql = `SELECT * FROM user WHERE refreshToken = ?`;
+    const queryResult = await queryDb(sql, [refreshToken]);
+
+    // If the refresh token is found in the database, update the user record
+    if (queryResult.length > 0) {
+        const updateSql = `UPDATE user SET refreshToken = NULL WHERE refreshToken = ?`;
+        await queryDb(updateSql, [refreshToken]);
+
+        // Clear the cookie
+        res.clearCookie('dataCleaningJWT', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+        });
+
+        return res.status(204).send(); // No content response
+    }
+
+    // If the refresh token is not found, clear the cookie and send a no content response
+    res.clearCookie('dataCleaningJWT', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+    });
+
+    return res.status(204).send(); // No content response
+};
+
 
 // REFRESH TOKEN
 // export const Refresh = async (req,res)=>{
