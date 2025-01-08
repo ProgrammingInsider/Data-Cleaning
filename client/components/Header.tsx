@@ -9,11 +9,13 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useRouter } from 'next/navigation';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoCloseSharp } from "react-icons/io5";
+import {axiosPrivate} from '@/services/axios';
+import { logout } from '@/utils/actions';
 
 
 const Header = () => {
     // const [isDarkMode, setDarkMode] = useState<boolean>(false)
-    const {userId, setUserId} = useGlobalContext();
+    const {user, setUser} = useGlobalContext();
     const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
     const route = useRouter();
 
@@ -47,16 +49,18 @@ const Header = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('/api/logout');
-            const data = await response.json();
-    
-            if (data.isLoggedOut) {
+            const response = await axiosPrivate.get('/logout');
+            const  result = await logout();
+            
+            
+            if (response && result) {
                 console.log("User logged out successfully");
-                setUserId(null); 
+                setUser(null); 
                 setIsMenuVisible(false)
                 route.push("/")
             }
         } catch (error) {
+            console.log(error);
             console.error("Error during logout:", error);
         }
     };
@@ -73,14 +77,14 @@ const Header = () => {
                         <Link href={"#"} className={`font-semibold heading `} onClick={() => setIsMenuVisible(false)}>About Us</Link>
                         <Link href={"#"} className={`font-semibold heading `} onClick={() => setIsMenuVisible(false)}>Contact Us</Link>
                         {
-                            userId
-                            ? (<button onClick={handleLogout} className='primaryBtn text-base outline-none' >Signout</button>)
-                            : (<Link href={"/login"} className={`font-semibold heading `} onClick={() => setIsMenuVisible(false)}>Signin</Link>)
+                            user
+                            ? (<Link href={"#"} onClick={handleLogout} className='font-semibold heading' >Signout</Link>)
+                            : (<Link href={"/login"} className="font-semibold heading" onClick={() => setIsMenuVisible(false)}>Signin</Link>)
                         }
                         
                     </div>
                     <GiHamburgerMenu className='primary text-2xl cursor-pointer sm:hidden' onClick={() => setIsMenuVisible(true)} />
-                    {userId && <Link title='dashboard' href={"/dashboard"}>
+                    {user && <Link title='dashboard' href={"/projects"}>
                         <FaCircleUser className='heading text-xl cursor-pointer' />
                     </Link>}
                     {/* <div className='cursor-pointer'>

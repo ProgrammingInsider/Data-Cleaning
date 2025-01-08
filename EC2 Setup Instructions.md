@@ -4,8 +4,6 @@ Follow the steps below to set up your EC2 instance for running your full-stack a
 
 ---
 
-### **1️⃣ Install Node.js & npm (using nvm)**
-
 ```bash
 # Switch to superuser (root) account
 sudo su -

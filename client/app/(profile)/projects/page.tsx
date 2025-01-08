@@ -46,6 +46,38 @@ const projectsData: projectType[] = [
       category: "Analytics",
       progress: 100,
   },
+
+  {
+    id:"abc123",
+    fileName: "Trip.xslx",
+    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
+    category: "Machine Learning",
+    progress: 44,
+},
+
+{
+    id:"abc123",
+    fileName: "Analytics.xslx",
+    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
+    category: "Analytics",
+    progress: 9,
+},
+
+{
+    id:"abc123",
+    fileName: "Research.xslx",
+    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
+    category: "Machine Learning",
+    progress: 95,
+},
+
+{
+    id:"abc123",
+    fileName: "Students.xslx",
+    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
+    category: "Analytics",
+    progress: 100,
+},
 ]
 
 

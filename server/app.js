@@ -30,7 +30,7 @@ import { privateAuth } from './middleware/privateAuth.js';
 
 // Config
 import corsOptions from './config/corsOptions.js';
-// import conn from './config/db.js';
+import { Db_connection } from './DB/db.js';
 
 // Security Middleware
 app.use(helmet());
@@ -51,6 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(credentials);
 app.use(cors(corsOptions));
+Db_connection();
 
 app.use('/api/v1/data-cleaning/', publicRoutes);
 

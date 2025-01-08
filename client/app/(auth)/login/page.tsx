@@ -11,18 +11,34 @@ import { MdCheckBoxOutlineBlank } from "react-icons/md";
 import { startTransition } from "react";
 import { useGlobalContext } from '@/context/context';
 
+interface Payload {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+}
+
+
 const initialState: {
     message:string | null, 
     errors?: Record<string, string[] | undefined>, 
     isLoggedIn?:boolean,
     accessToken?: string | null,
-    userId?: string | null
+    userId?: string | null,
+    payload?:Payload
+
 } = {
     message:null,
     isLoggedIn:false,
     errors:{},
     accessToken: null,
-    userId: null
+    userId: null,
+    payload:{
+        userId:"",
+        email: "",
+        firstName: "",
+        lastName: ""
+    }
 }
 
 const Login = () => {
@@ -30,7 +46,7 @@ const Login = () => {
     const [togglePassword, setTogglePassword] = useState<boolean>(false);
     const [state, formAction] = useActionState(login, initialState);
     const [loading, setLoading] = useState<boolean>(false);
-    const {setUserId} = useGlobalContext();
+    const {user,setUser} = useGlobalContext();
     const router = useRouter();
     
     const handleCheckboxToggle = () => {
@@ -49,9 +65,9 @@ const Login = () => {
     }
     
     useEffect(()=>{
-        if(state?.isLoggedIn){
-            const userId = state?.userId as string 
-            setUserId(userId)
+        if(state?.isLoggedIn && state?.payload){
+            setUser(state?.payload)
+            console.log(user);
             router.push("/")
         }
     },[state])

@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  box-sizing: border-box;
+}
 :root {
   /* --color-primary: #121212;  */
 
@@ -30,8 +33,8 @@
   --color-input-bg: #3c3c3c; 
   --color-secondary: #2C2C2E; 
   --color-paragraph: #cccccc; 
-  --font-heading: "Georgia", "Charter", serif;
-  --font-paragraph: "Inter", "Georgia", serif;
+  --font-heading: "Roboto", "Charter", serif;
+  --font-paragraph: "Roboto", "Georgia", serif;
   --font-ui: "Inter", "Helvetica Neue", "Arial", sans-serif;
 }
 

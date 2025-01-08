@@ -6,7 +6,6 @@ const routes = express.Router();
 import {
   Login,
   Register,
-  RefreshToken,
   Logout
 } from '../controllers/UserAuth.js';
 
@@ -15,6 +14,5 @@ import {
 routes.route('/login').post(Login);
 routes.route('/register').post(Register);
 routes.route('/logout').get(Logout);
-routes.route('/refreshtoken').get(RefreshToken);
 
 export default routes;
