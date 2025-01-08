@@ -54,6 +54,8 @@ app.use(cors(corsOptions));
 Db_connection();
 
 app.use('/api/v1/data-cleaning/', publicRoutes);
+app.use('/api/v1/data-cleaning/', privateAuth,publicRoutes);
+
 
 app.use(notFound);
 app.use(errorHandler);
