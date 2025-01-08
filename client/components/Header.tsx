@@ -9,7 +9,6 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useRouter } from 'next/navigation';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoCloseSharp } from "react-icons/io5";
-import {axiosPrivate} from '@/services/axios';
 import { logout } from '@/utils/actions';
 
 
@@ -49,11 +48,9 @@ const Header = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await axiosPrivate.get('/logout');
             const  result = await logout();
             
-            
-            if (response && result) {
+            if (result) {
                 console.log("User logged out successfully");
                 setUser(null); 
                 setIsMenuVisible(false)

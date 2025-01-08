@@ -149,16 +149,16 @@ export const login =  async(
         cookieStore.set("accessToken", accessToken, {
             path: "/",
             httpOnly: true, 
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
             maxAge: 1 * 24 * 60 * 60, 
         });
 
         cookieStore.set("payload", JSON.stringify(payload), {
             path: "/",
             httpOnly: false,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
             maxAge: 1 * 24 * 60 * 60,
         });
         

@@ -84,44 +84,44 @@ export const Login = async (req, res, next) => {
 };
 
 // LOGOUT
-export const Logout = async (req, res, next) => {
-    const cookies = req.cookies;
+// export const Logout = async (req, res, next) => {
+//     const cookies = req.cookies;
 
-    // Check if the cookie exists
-    if (!cookies?.dataCleaningJWT) {
-        return next(new NoContentError("No content to send back"));
-    }
+//     // Check if the cookie exists
+//     if (!cookies?.dataCleaningJWT) {
+//         return next(new NoContentError("No content to send back"));
+//     }
 
-    const refreshToken = cookies.dataCleaningJWT;
+//     const refreshToken = cookies.dataCleaningJWT;
 
-    // Check if the refresh token exists in the database
-    const sql = `SELECT * FROM user WHERE refreshToken = ?`;
-    const queryResult = await queryDb(sql, [refreshToken]);
+//     // Check if the refresh token exists in the database
+//     const sql = `SELECT * FROM user WHERE refreshToken = ?`;
+//     const queryResult = await queryDb(sql, [refreshToken]);
 
-    // If the refresh token is found in the database, update the user record
-    if (queryResult.length > 0) {
-        const updateSql = `UPDATE user SET refreshToken = NULL WHERE refreshToken = ?`;
-        await queryDb(updateSql, [refreshToken]);
+//     // If the refresh token is found in the database, update the user record
+//     if (queryResult.length > 0) {
+//         const updateSql = `UPDATE user SET refreshToken = NULL WHERE refreshToken = ?`;
+//         await queryDb(updateSql, [refreshToken]);
 
-        // Clear the cookie
-        res.clearCookie('dataCleaningJWT', {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-        });
+//         // Clear the cookie
+//         res.clearCookie('dataCleaningJWT', {
+//             httpOnly: true,
+//             secure: true,
+//             sameSite: 'None',
+//         });
 
-        return res.status(204).send(); // No content response
-    }
+//         return res.status(204).send(); // No content response
+//     }
 
-    // If the refresh token is not found, clear the cookie and send a no content response
-    res.clearCookie('dataCleaningJWT', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-    });
+//     // If the refresh token is not found, clear the cookie and send a no content response
+//     res.clearCookie('dataCleaningJWT', {
+//         httpOnly: true,
+//         secure: true,
+//         sameSite: 'None',
+//     });
 
-    return res.status(204).send(); // No content response
-};
+//     return res.status(204).send(); // No content response
+// };
 
 
 // REFRESH TOKEN

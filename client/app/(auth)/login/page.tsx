@@ -46,7 +46,7 @@ const Login = () => {
     const [togglePassword, setTogglePassword] = useState<boolean>(false);
     const [state, formAction] = useActionState(login, initialState);
     const [loading, setLoading] = useState<boolean>(false);
-    const {user,setUser} = useGlobalContext();
+    const {setUser} = useGlobalContext();
     const router = useRouter();
     
     const handleCheckboxToggle = () => {
@@ -67,7 +67,6 @@ const Login = () => {
     useEffect(()=>{
         if(state?.isLoggedIn && state?.payload){
             setUser(state?.payload)
-            console.log(user);
             router.push("/")
         }
     },[state])

@@ -14,6 +14,11 @@ const credentials = (req, res, next) => {
       'GET, POST, PUT, DELETE, OPTIONS'
     );
   }
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200); 
+  }
+  
   next();
 };
 
