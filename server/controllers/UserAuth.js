@@ -17,7 +17,7 @@ export const Register = async (req, res, next) => {
     }
 
     // CHECK IF USER EXISTS
-    const existanceSql = `SELECT email FROM user WHERE email = ?`;
+    const existanceSql = `SELECT email FROM users WHERE email = ?`;
     const getResult = await queryDb(existanceSql, [email]);
 
     if (getResult.length > 0) {
@@ -29,7 +29,7 @@ export const Register = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // INSERT USER INTO DATABASE
-    const insertSql = `INSERT INTO user (email, firstName, lastName, password) VALUES (?, ?, ?, ?)`;
+    const insertSql = `INSERT INTO users (email, first_name, last_name, password) VALUES (?, ?, ?, ?)`;
     const postResult = await queryDb(insertSql, [email, firstName, lastName, hashedPassword]);
 
     if (postResult.affectedRows) {
@@ -49,7 +49,7 @@ export const Login = async (req, res, next) => {
     }
 
     // CHECK IF USER EXISTS
-    const sql = `SELECT * FROM user WHERE email = ?`;
+    const sql = `SELECT * FROM users WHERE email = ?`;
     const queryResult = await queryDb(sql, [email]);
 
     if (queryResult.length === 0) {
@@ -59,14 +59,14 @@ export const Login = async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, queryResult[0].password);
 
     if (isMatch) {
-        const { email, firstName, lastName } = queryResult[0];
+        const { user_id, email, first_name, last_name } = queryResult[0];
 
         // Create access token
-        const payload = { email, firstName, lastName };
+        const payload = { userId:user_id, email, firstName:first_name, lastName:last_name };
         const { accessToken, refreshToken } = tokenService(payload);
 
         // Store refresh token in the database
-        const refreshSql = `UPDATE user SET refreshToken = ? WHERE email = ?`;
+        const refreshSql = `UPDATE users SET refresh_token = ? WHERE email = ?`;
         await queryDb(refreshSql, [refreshToken, email]);
 
         // Set refresh token in cookies

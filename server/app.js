@@ -19,8 +19,9 @@ const app = express();
 dotenv.config();
 
 // Routes
-import publicRoutes from './routes/publicRoutes.js';
 
+import publicRoutes from './routes/publicRoutes.js';
+import privateRoutes from './routes/privateRoutes.js';
 
 // Middleware
 import credentials from './middleware/credentials.js';
@@ -54,7 +55,7 @@ app.use(cors(corsOptions));
 Db_connection();
 
 app.use('/api/v1/data-cleaning/', publicRoutes);
-app.use('/api/v1/data-cleaning/', privateAuth,publicRoutes);
+app.use('/api/v1/data-cleaning/', privateAuth, privateRoutes);
 
 
 app.use(notFound);

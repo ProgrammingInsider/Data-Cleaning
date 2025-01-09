@@ -4,8 +4,9 @@ import {startTransition, useActionState, useEffect, useState} from 'react'
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosClose } from "react-icons/io";
 import { FiUpload } from "react-icons/fi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaFileAlt } from "react-icons/fa";
-import { UploadFile } from '@/utils/profileActions';
+import { UploadFile } from '@/utils/fileActions';
 
 type categoriesType = {
     category:string;
@@ -24,7 +25,7 @@ const initialState : {message: string | null, isCreated: boolean, errors?: Recor
     errors:{},
   }
 
-const Upload = ({setShowOverlay}:{setShowOverlay:React.Dispatch<boolean>}) => {
+const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setShowOverlay:React.Dispatch<boolean>, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean}) => {
     const [showCategory, setShowCategory] = useState(false);
     const [category, setCategory] = useState('');
     const [desc, setDesc] = useState('');
@@ -32,17 +33,25 @@ const Upload = ({setShowOverlay}:{setShowOverlay:React.Dispatch<boolean>}) => {
     const [fileError, setFileError] = useState<string | null>(null);
     const [showSuccessMessage,setShowSuccessMessage] = useState(false);
     const [state, formAction] = useActionState(UploadFile, initialState);
+    const [loading, setLoading] = useState(false);
 
         const handleSubmit = async (e: React.FormEvent<HTMLElement>) => {
             e.preventDefault();
         
             const formData = new FormData(e.currentTarget as HTMLFormElement);
         
-            // setLoading(true);
-            startTransition(() => {
-            formAction(formData);
-            //   setLoading(false);
-            });
+            setLoading(true);
+            if(uploadedFile){
+                startTransition(() => {
+                formAction(formData);
+                setLoading(false);
+                setRevalidateProjects(!revalidateProjects);
+                setUploadedFile(null)
+                });
+            }else{
+                setFileError("File upload cannot be empty. Only CSV or Excel files are allowed.");    
+            }
+            
         }
 
         useEffect(() => {
@@ -172,8 +181,12 @@ const Upload = ({setShowOverlay}:{setShowOverlay:React.Dispatch<boolean>}) => {
                     </div>
                     <div className='flex justify-end gap-2 mt-5'>
                         <button className='secondaryBtn' onClick={()=>{setShowOverlay(false)}}>Cancel</button>
-                        <button type='submit' className='primaryBtn flex gap-3 items-center'>
-                        <FiUpload className='font-bold text-xl' />
+                        <button type='submit' className='primaryBtn flex gap-3 items-center' disabled={loading}>
+                            {loading ? (
+                                <AiOutlineLoading3Quarters className='animate-spin text-xl' />
+                            ) : (
+                                <FiUpload className='font-bold text-xl' />
+                            )}
                             Upload
                         </button>
                     </div>

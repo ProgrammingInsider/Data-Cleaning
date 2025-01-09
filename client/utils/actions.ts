@@ -20,7 +20,17 @@ export const createUser = async (
         firstName: z.string().nonempty("First Name is required."),
         lastName: z.string().nonempty("Last Name is required."),
         email: z.string().email("Invalid email address."),
-        password: z.string().min(8, "Password must be at least 8 characters long."),
+        // password: z.string().min(8, "Password must be at least 8 characters long."),
+        password: z.string()
+        .nonempty({ message: "Password is required" })
+        .min(6, { message: "Password must be at least 6 characters long" })
+        .regex(
+            /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/,
+            {
+                message:
+                "Password must contain one uppercase letter, one lowercase letter, one digit, and one special character",
+            },
+        ),
         confirmPassword: z.string().nonempty("Confirm Password is required."),
     }).refine((data) => data.password === data.confirmPassword, {
         message: "Passwords do not match.",

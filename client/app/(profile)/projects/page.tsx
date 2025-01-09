@@ -5,80 +5,15 @@ import { IoMdAdd } from "react-icons/io";
 import ProjectCard from "@/components/ProjectCard";
 import { useState, useEffect, useRef } from "react";
 import Upload from "@/components/Upload";
+import { GetFile } from "@/utils/fileActions";
 
 interface projectType {
-  id:string;
-  fileName:string;
+  file_id:string;
+  original_name:string;
   description:string;
   category:string;
   progress:number;
 }
-
-const projectsData: projectType[] = [
-  {
-      id:"abc123",
-      fileName: "Trip.xslx",
-      description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-      category: "Machine Learning",
-      progress: 44,
-  },
-
-  {
-      id:"abc123",
-      fileName: "Analytics.xslx",
-      description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-      category: "Analytics",
-      progress: 9,
-  },
-
-  {
-      id:"abc123",
-      fileName: "Research.xslx",
-      description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-      category: "Machine Learning",
-      progress: 95,
-  },
-
-  {
-      id:"abc123",
-      fileName: "Students.xslx",
-      description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-      category: "Analytics",
-      progress: 100,
-  },
-
-  {
-    id:"abc123",
-    fileName: "Trip.xslx",
-    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-    category: "Machine Learning",
-    progress: 44,
-},
-
-{
-    id:"abc123",
-    fileName: "Analytics.xslx",
-    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-    category: "Analytics",
-    progress: 9,
-},
-
-{
-    id:"abc123",
-    fileName: "Research.xslx",
-    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-    category: "Machine Learning",
-    progress: 95,
-},
-
-{
-    id:"abc123",
-    fileName: "Students.xslx",
-    description: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sapiente accusantium dolorem unde necessitatibus quisquam explicabo quidem non inventore dolores vel?",
-    category: "Analytics",
-    progress: 100,
-},
-]
 
 
 const Dashboard = () => {
@@ -86,8 +21,29 @@ const Dashboard = () => {
   const [viewCategory, setViewCategory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [revalidateProjects, setRevalidateProjects] = useState(false);
+  const [projects, setProjects] = useState<projectType[]>([]);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    setLoading(true);
+    const fetchProject = async() => {
+
+      const resp = await GetFile();
+      
+      if(resp && resp.data.status){
+          setProjects(resp.data.result);
+        }
+
+      setLoading(false);
+      }
+
+      fetchProject()
+  },[revalidateProjects])
+
+  
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -104,8 +60,8 @@ const Dashboard = () => {
 
 
   // Filter projects by search term
-  const filteredProjects = projectsData.filter((project) =>
-    project.fileName.toLowerCase().includes(search.toLowerCase()) &&
+  const filteredProjects = projects.filter((project) =>
+    project.original_name.toLowerCase().includes(search.toLowerCase()) &&
     (selectedCategory ? project.category === selectedCategory : true)
   );
   
@@ -159,26 +115,18 @@ const Dashboard = () => {
           </div>
       </header>
       <main className="grid grid-cols-6 mt-4 gap-4">
-        {/* {
-          projectsData.map((project,index)=>{
-            return (
-              <ProjectCard key={index} project={project}/>
-            )
-          })
-        } */}
         {filteredProjects.length > 0 ? (
-          filteredProjects.map((project) => <ProjectCard key={project.id} project={project} />)
+          filteredProjects.map((project) => <ProjectCard key={project.file_id} project={project} />)
         ) : (
-          <p className="col-span-6 text-center text-gray-500">No projects found.</p>
+          <p className="col-span-6 text-center text-gray-500">{loading ? "Loading...":"No projects found."}</p>
         )}
       </main>
        {/* The Overlay Div */}
        {showOverlay && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center overflow-y-scroll pt-40 sm:pt-10 md:pt-0 custom-scrollbar"
-          // onClick={() => setShowOverlay(false)} 
         >
-            <Upload setShowOverlay={setShowOverlay} />
+            <Upload setShowOverlay={setShowOverlay} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} />
         </div>
       )}
     </div>

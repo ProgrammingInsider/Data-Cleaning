@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { userTable, filesTable } from './creation.js';
 
 dotenv.config();
 
@@ -22,6 +23,10 @@ export const Db_connection = async () => {
     try {
         const connection = await pool.getConnection();
         console.log("Connected to the database successfully.");
+
+        await userTable(pool);
+        await filesTable(pool);
+        
         connection.release();
     } catch (err) {
         console.error("Database connection failed:", err);

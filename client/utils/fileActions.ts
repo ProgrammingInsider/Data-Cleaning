@@ -1,5 +1,7 @@
 'use server';
+import { axiosPrivate } from '@/services/axios';
 import z, { ZodError } from 'zod';
+import { cookies } from "next/headers";
 
 type UploadResponse = {
     message: string | null;
@@ -34,12 +36,17 @@ export const UploadFile = async (state: UploadResponse, formData: FormData): Pro
     try{
         UploadValidation.parse(inputValues);
 
-        console.log(inputValues);
+        const cookieStore = await cookies();
+        const accessTokenCookie = cookieStore.get("accessToken")?.value;
 
-        return {
-            message: "Uploaded Successfully",
-            isCreated: true
-        };
+        const {data} = await axiosPrivate.post("/upload",formData,{
+            headers: {
+                Authorization: `Bearer ${accessTokenCookie}`, 
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        return {...data};
     }catch(error){
         if (error instanceof ZodError) {
             return {
@@ -54,6 +61,34 @@ export const UploadFile = async (state: UploadResponse, formData: FormData): Pro
             isCreated: false,
             errors: { root: ["Something went wrong. Please try again!"] },
         };
+    }
+
+}
+
+
+export const GetFile = async () => {
+    const cookieStore = await cookies();
+    const accessTokenCookie = cookieStore.get("accessToken")?.value;
+    
+    try{
+
+        const {data} = await axiosPrivate.get("/projects",{
+            headers: {
+                Authorization: `Bearer ${accessTokenCookie}`, 
+            },
+        });
+        
+        
+        return {data};
+    }catch(error){
+
+    if(error){
+        return {
+            message: '',
+            isCreated: false,
+            errors: { root: ["Something went wrong. Please try again!"] },
+        };
+    }
     }
 
 }

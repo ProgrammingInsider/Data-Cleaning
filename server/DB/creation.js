@@ -1,21 +1,64 @@
 // // CREATE DATABASE
-export const database = (con) => {
+export const database = async (pool) => {
     const sql = 'CREATE DATABASE datacleaningDB';
-    con.query(sql,(err,result)=>{
-        if (err) throw err
-        console.log("database created");
-    })
+    await pool.query(sql); 
+    console.log("Users table created");
 }
+
+// USERS TABLE
+export const userTable = async (pool) => {
+    const sql = `
+    CREATE TABLE IF NOT EXISTS users (
+        user_id CHAR(36) NOT NULL DEFAULT (UUID()),
+        email VARCHAR(255) NOT NULL,
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        refresh_token VARCHAR(255) DEFAULT NULL,
+        PRIMARY KEY (user_id),
+        UNIQUE KEY email_unique (email)
+    );
+    `;
+
+    await pool.query(sql); 
+    console.log("Users table created");
+};
+
+
+// FILES TABLEA
+export const filesTable = async (pool) => {
+    const sql = `
+    CREATE TABLE IF NOT EXISTS files (
+        file_id CHAR(36) NOT NULL DEFAULT (UUID()),
+        user_id CHAR(36) NOT NULL,
+        original_name VARCHAR(255) NOT NULL,
+        category VARCHAR(255) NOT NULL,
+        description VARCHAR(255) NOT NULL,
+        progress VARCHAR(255) DEFAULT (0),
+        file_key VARCHAR(255) NOT NULL UNIQUE,
+        file_type VARCHAR(50) NOT NULL,
+        file_size BIGINT NOT NULL,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (file_id),
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    );
+    `;
+
+    await pool.query(sql);
+    console.log("Files table created");
+};
+
+
 
 // // CREATE USER TABLE
-export const userTable = (con) => {
+// export const userTable = (con) => {
 
-    const sql = 'CREATE TABLE `user` (`userId` CHAR(36) NOT NULL DEFAULT (UUID()),`email` varchar(255) NOT NULL, `firstName` varchar(255) NOT NULL, `lastName` varchar(255) DEFAULT NULL,`password` varchar(255) NOT NULL, `refreshToken` varchar(255) DEFAULT NULL, PRIMARY KEY (`userId`), UNIQUE KEY `Email` (`email`));'
-    con.query(sql,(err,result)=>{
-        if (err) throw err
-        console.log("User table created");
-    })
-}
+//     const sql = 'CREATE TABLE `users` (`userId` CHAR(36) NOT NULL DEFAULT (UUID()),`email` varchar(255) NOT NULL, `firstName` varchar(255) NOT NULL, `lastName` varchar(255) DEFAULT NULL,`password` varchar(255) NOT NULL, `refreshToken` varchar(255) DEFAULT NULL, PRIMARY KEY (`userId`), UNIQUE KEY `Email` (`email`));'
+//     con.query(sql,(err,result)=>{
+//         if (err) throw err
+//         console.log("User table created");
+//     })
+// }
 
 // // CREATE DEPARTURE TOWN TABLE
 // export const departureTownTable = (con) => {

@@ -4,15 +4,16 @@ import { FaGear } from "react-icons/fa6";
 import { SiGoogleanalytics } from "react-icons/si";
 
 interface projectType {
-    id:string;
-    fileName:string;
-    description:string;
-    category:string;
-    progress:number;
-  }
+  file_id:string;
+  original_name:string;
+  description:string;
+  category:string;
+  progress:number;
+}
+
 
 const ProjectCard = ({project}:{project:projectType}) => {
-    const {id,fileName,description,category,progress} = project;
+    const {file_id,original_name,description,category,progress} = project;
     const progressNumber = Number(progress);
 
     let progressStatus = '';
@@ -41,7 +42,7 @@ const ProjectCard = ({project}:{project:projectType}) => {
   return (
     <div className='secondaryBg col-span-6 md:col-span-3 lg:col-span-2 px-4 py-6 rounded-lg'>
         <div className='flex gap-3 items-center justify-between mb-3'>
-            <h1 className='text-2xl font-bold'>{fileName}</h1>
+            <h1 className='text-2xl font-bold truncate w-full'>{original_name}</h1>
             {
                 (category === "Machine Learning" && <FaGear title='Machine learning' />) ||
                 (category === "Analytics" && <SiGoogleanalytics title='Analytics' />)
@@ -67,7 +68,7 @@ const ProjectCard = ({project}:{project:projectType}) => {
           <button className={`text-black font-medium text-sm py-1 px-2 inProgress rounded-lg ${progressStyle}`}>
             {progressStatus}
           </button>
-          <Link href={`${id}`} className='hover:underline primary font-bold'>View Details &nbsp;</Link>
+          <Link href={`${file_id}`} className='hover:underline primary font-bold'>View Details &nbsp;</Link>
         </div>
 
     </div>
