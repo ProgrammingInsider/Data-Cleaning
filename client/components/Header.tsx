@@ -9,7 +9,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useRouter } from 'next/navigation';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoCloseSharp } from "react-icons/io5";
-import { logout } from '@/utils/actions';
+import { logout } from '@/utils/authActions';
 
 
 const Header = () => {
@@ -64,11 +64,11 @@ const Header = () => {
 
     return (
         <>
-        <section className='h-16 flex items-center px-5 z-50'>
+        <section className='h-16 flex items-center px-5 z-30'>
             <header className='max-w-7xl mx-auto flex justify-between items-center w-full'>
                 <Link href={"/"} className='heading font-bold text-2xl'>Sweepo</Link>
                 <nav className='flex items-center gap-3'>
-                    <div className={`flex flex-col pt-24 items-center gap-3 text-base fixed top-0 left-0 bottom-0 background sm:bg-transparent w-full z-10 sm:flex-row sm:pt-0 sm:relative ${isMenuVisible ? 'flex' : 'hidden sm:flex'} `}>
+                    <div className={`flex flex-col pt-24 items-center gap-3 text-base fixed top-0 left-0 bottom-0 background sm:bg-transparent w-full z-50 sm:flex-row sm:pt-0 sm:relative ${isMenuVisible ? 'flex' : 'hidden sm:flex'} `}>
                         <IoCloseSharp className='fixed right-4 top-4 text-2xl font-bold cursor-pointer sm:hidden' onClick={() => setIsMenuVisible(false)} />
                         <Link href={"#"} className={`font-semibold heading `} onClick={() => setIsMenuVisible(false)}>How it works</Link>
                         <Link href={"#"} className={`font-semibold heading `} onClick={() => setIsMenuVisible(false)}>About Us</Link>
@@ -80,7 +80,7 @@ const Header = () => {
                         }
                         
                     </div>
-                    <GiHamburgerMenu className='primary text-2xl cursor-pointer sm:hidden' onClick={() => setIsMenuVisible(true)} />
+                    <GiHamburgerMenu className='heading text-2xl cursor-pointer sm:hidden' onClick={() => setIsMenuVisible(true)} />
                     {user && <Link title='dashboard' href={"/projects"}>
                         <FaCircleUser className='heading text-xl cursor-pointer' />
                     </Link>}

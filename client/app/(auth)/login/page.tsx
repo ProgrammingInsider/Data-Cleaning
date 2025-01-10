@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation';
-import { login } from "@/utils/actions";
+import { login } from "@/utils/authActions";
 import Image from "next/image"
 import Link from "next/link";
 import { useEffect, useState } from "react";

@@ -2,10 +2,10 @@
 import { axiosPrivate } from '@/services/axios';
 import z, { ZodError } from 'zod';
 import { cookies } from "next/headers";
+import { AxiosError } from 'axios';
 
 type UploadResponse = {
     message: string | null;
-    isCreated: boolean;
     errors?: Record<string, string[] | undefined>;
 };
 
@@ -47,22 +47,48 @@ export const UploadFile = async (state: UploadResponse, formData: FormData): Pro
         });
 
         return {...data};
-    }catch(error){
-        if (error instanceof ZodError) {
-            return {
-                message: '',
-                isCreated: false,
-                errors: error.flatten().fieldErrors,
-            };
+    }catch(error: unknown){
+            
+            if (error instanceof AxiosError) {
+                
+                const { response } = error;
+                if (response) {
+                    const { status, data } = response;
+                    if (status === 400) {
+                        return {
+                            message: "",
+                            errors: { root: [data?.message || "Invalid data."] },
+                        };
+                    } else if (status === 500) {
+                        return {
+                            message: "",
+                            errors: { root: [data?.message || "Server error. Please try again later."] },
+                        };
+                    } else {
+                        return {
+                            message: "",
+                            errors: { root: [data?.message || "Something went wrong. Please try again!"] },
+                        };
+                    }
+                } else {
+                    return {
+                        message: "",
+                        errors: { root: ["No response received from the server."] },
+                    };
+                }
+            } else if (error instanceof ZodError) {
+                return {
+                    message: "",
+                    errors: error.flatten().fieldErrors ,
+                };
+            } else {
+                return {
+                    message: "",
+                    errors: { root: ["Something went wrong. Please try again!"] },
+                };
+            }
         }
-        console.error("Unexpected Error:", error);
-        return {
-            message: '',
-            isCreated: false,
-            errors: { root: ["Something went wrong. Please try again!"] },
-        };
-    }
-
+        
 }
 
 
@@ -85,10 +111,8 @@ export const GetFile = async () => {
     if(error){
         return {
             message: '',
-            isCreated: false,
             errors: { root: ["Something went wrong. Please try again!"] },
         };
     }
     }
-
 }

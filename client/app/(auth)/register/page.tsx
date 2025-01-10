@@ -8,7 +8,7 @@ import { FaEye } from "react-icons/fa";
 import { startTransition } from "react";
 
 // actions
-import { createUser } from "@/utils/actions";
+import { createUser } from "@/utils/authActions";
 
 
 const initialState: { message: string | null; errors?: Record<string, string[] | undefined> } = {
@@ -17,6 +17,7 @@ const initialState: { message: string | null; errors?: Record<string, string[] |
 };
 
 const Register = () => {
+    const [clearValue, setClearValue] = useState({firstName:'',lastName:'',email:'', password:'', confirmPassword:''});
     const [togglePassword, setTogglePassword] = useState<boolean>(false);
     const [toggleConfirmPassword, setToggleConfirmPasword] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -29,6 +30,7 @@ const Register = () => {
     startTransition(() => {
         formAction(formData);
         setLoading(false);
+        setClearValue({firstName:'',lastName:'',email:'', password:'', confirmPassword:''});
     });
 
     }
@@ -56,21 +58,21 @@ const Register = () => {
             </>}
             <div className="flex flex-col mb-5">
                 <label className="label" htmlFor="firstName">First Name <span className="asterik">*</span></label>
-                <input type="text" name="firstName" className="input value w-full mt-2" id="firstName" placeholder="First Name" required/>
+                <input type="text" name="firstName" className="input value w-full mt-2" id="firstName" placeholder="First Name" required value={clearValue.firstName} onChange={(e)=>setClearValue({ ...clearValue, firstName: e.target.value })}/>
                 {state.errors && state.errors.firstName && (
                     <p className="error-message">{state.errors.firstName}</p>
                 )}
             </div>
             <div className="flex flex-col mb-5">
                 <label className="label" htmlFor="lastName">Last Name <span className="asterik">*</span></label>
-                <input type="text" name="lastName" className="input value w-full mt-2" id="lastName" placeholder="Last Name" required/>
+                <input type="text" name="lastName" className="input value w-full mt-2" id="lastName" placeholder="Last Name" required value={clearValue.lastName} onChange={(e)=>setClearValue({ ...clearValue, lastName: e.target.value })}/>
                 {state.errors && state.errors.lastName && (
                     <p className="error-message">{state.errors.lastName}</p>
                 )}
             </div>
             <div className="flex flex-col mb-5">
                 <label className="label" htmlFor="email">Email <span className="asterik">*</span></label>
-                <input type="email" name="email" className="input value w-full mt-2" id="email" placeholder="Your Email" required/>
+                <input type="email" name="email" className="input value w-full mt-2" id="email" placeholder="Your Email" required value={clearValue.email} onChange={(e)=>setClearValue({ ...clearValue, email: e.target.value })}/>
                 {state.errors && state.errors.email && (
                     <p className="error-message">{state.errors.email}</p>
                 )}
@@ -78,7 +80,7 @@ const Register = () => {
             <div className="flex flex-col mb-5 relative z-0">
                 <label className="label" htmlFor="password">Password <span className="asterik">*</span></label>
                 <div className="flex mt-2 relative">
-                <input type={togglePassword ?"text" :"password"} name="password" className="input value w-full pr-12" id="password" placeholder="Password" required/>
+                <input type={togglePassword ?"text" :"password"} name="password" className="input value w-full pr-12" id="password" placeholder="Password" required value={clearValue.password} onChange={(e)=>setClearValue({ ...clearValue, password: e.target.value })}/>
                 <div className="flex justify-center items-center py-1 px-4 rounded-lg box-border  cursor-pointer absolute top-0 right-0 bottom-0" onClick={()=>setTogglePassword(!togglePassword)}>
                     <FaEye className="value"/>
                 </div>
@@ -91,7 +93,7 @@ const Register = () => {
             <div className="flex flex-col mb-5 relative w-full">
                 <label className="label" htmlFor="confirmPassword">Confirm Password <span className="asterik">*</span></label>
                 <div className="flex mt-2 relative">
-                    <input type={toggleConfirmPassword ?"text" :"password"} name="confirmPassword" className="input value w-full pr-12" id="confirmPassword" placeholder="Confirm Password" required />
+                    <input type={toggleConfirmPassword ?"text" :"password"} name="confirmPassword" className="input value w-full pr-12" id="confirmPassword" placeholder="Confirm Password" required value={clearValue.confirmPassword} onChange={(e)=>setClearValue({ ...clearValue, confirmPassword: e.target.value })}/>
                     <div className="flex justify-center items-center py-1 px-4 rounded-lg box-border  cursor-pointer absolute top-0 right-0 bottom-0" onClick={()=>setToggleConfirmPasword(!toggleConfirmPassword)}>
                     <FaEye className="value"/>
                     </div>

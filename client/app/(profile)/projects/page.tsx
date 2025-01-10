@@ -67,14 +67,15 @@ const Dashboard = () => {
   
   return (
     <div className="background p-10 rounded-lg w-full min-h-screen mb-20 sm:w-full">
-      <header className="secondaryBg w-full h-20 flex justify-between items-center px-3 rounded-lg">
-        <h1 className="text-2xl font-bold">Projects</h1>
-        
+        <h1 className="text-2xl font-bold mb-3">Projects</h1>
+      {/* <header className="secondaryBg w-full h-10 flex justify-between items-center px-3 rounded-lg mb-3">
+      </header> */}
+      <header className="secondaryBg w-full h-15 flex justify-center sm:justify-end items-center py-3 px-6 rounded-lg">
           <div className="flex sm:flex-row gap-4 items-center">
             <form onSubmit={(e) => e.preventDefault()}>
               <input
                 type="text"
-                className="input w-10 sm:w-40"
+                className="input sm:max-w-30"
                 placeholder="Search projects"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -111,7 +112,7 @@ const Dashboard = () => {
                   )
                 }
             </div>
-            <button className="primaryBtn flex gap-1 items-center text-sm" onClick={()=>setShowOverlay(true)}><IoMdAdd className="text-xl" /><span className="hidden sm:block">New project</span></button>
+            <button className="primaryBtn primaryBtnTxt flex gap-1 items-center text-sm" onClick={()=>setShowOverlay(true)}><IoMdAdd className="text-xl" /><span className="hidden sm:block">New project</span></button>
           </div>
       </header>
       <main className="grid grid-cols-6 mt-4 gap-4">

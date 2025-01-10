@@ -205,7 +205,6 @@ export const login =  async(
 export const logout = async (): Promise<{ message: string }> => {
     const cookieStore = await cookies();
 
-    // Remove the accessToken and payload from cookies
     cookieStore.delete('accessToken');
 
     cookieStore.delete('payload');

@@ -46,9 +46,10 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setS
                 formAction(formData);
                 setLoading(false);
                 setRevalidateProjects(!revalidateProjects);
-                setUploadedFile(null)
+                // setUploadedFile(null)
                 });
             }else{
+                setLoading(false);
                 setFileError("File upload cannot be empty. Only CSV or Excel files are allowed.");    
             }
             
