@@ -33,9 +33,11 @@ const Dashboard = () => {
 
       const resp = await GetFile();
       
-      if(resp && resp.data.status){
-          setProjects(resp.data.result);
-        }
+      if(resp?.data.status){
+        setProjects(resp.data.result);
+      }else{
+        setProjects([]);
+      }
 
       setLoading(false);
       }
@@ -56,14 +58,20 @@ const Dashboard = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+
   }, []);
 
 
   // Filter projects by search term
-  const filteredProjects = projects.filter((project) =>
-    project.original_name.toLowerCase().includes(search.toLowerCase()) &&
-    (selectedCategory ? project.category === selectedCategory : true)
-  );
+  const filteredProjects = projects.filter((project) => {
+    if (projects.length > 0) {
+      return (
+        project.original_name.toLowerCase().includes(search.toLowerCase()) &&
+        (selectedCategory ? project.category === selectedCategory : true)
+      );
+    }
+    return false;
+  });  
   
   return (
     <div className="background p-10 rounded-lg w-full min-h-screen mb-20 sm:w-full">
