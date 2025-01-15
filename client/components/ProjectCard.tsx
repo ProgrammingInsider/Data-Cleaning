@@ -1,44 +1,19 @@
-import Link from 'next/link';
-import React from 'react'
+'use client'
+
+// import Link from 'next/link';
+import {useState} from 'react'
 import { FaGear } from "react-icons/fa6";
 import { SiGoogleanalytics } from "react-icons/si";
-
-interface projectType {
-  file_id:string;
-  original_name:string;
-  description:string;
-  category:string;
-  progress:number;
-}
+import ProjectDetail from './ProjectDetail';
+import {projectType} from '../utils/types'
+import Progress from './Progress';
+import ProgressStatus from './ProgressStatus';
 
 
-const ProjectCard = ({project}:{project:projectType}) => {
-    const {file_id,original_name,description,category,progress} = project;
-    const progressNumber = Number(progress);
+const ProjectCard = ({project, setRevalidateProjects, revalidateProjects}:{project:projectType, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean}) => {
+  const [showDetail, setShowDetail] = useState<boolean>(false);
+    const {original_name,description,category,progress} = project;
 
-    let progressStatus = '';
-    let progressStyle = '';
-    switch (true) {
-        case progress <= 10:
-            progressStatus = 'Planning';
-            progressStyle = "planning";
-            break;
-        case progress > 10 && progress <= 90:
-            progressStatus = 'In Progress';
-            progressStyle = "inProgress";
-            break;
-        case progress > 90 && progress < 100:
-            progressStatus = 'In Review';
-            progressStyle = "inReview";
-            break;
-        case progress === 100:
-            progressStatus = 'Completed';
-            progressStyle = "completed";
-            break;
-        default:
-            progressStatus = 'Unknown';
-            break;
-    }
   return (
     <div className='secondaryBg col-span-6 md:col-span-3 lg:col-span-2 px-4 py-6 rounded-lg'>
         <div className='flex gap-3 items-center justify-between mb-3'>
@@ -51,25 +26,22 @@ const ProjectCard = ({project}:{project:projectType}) => {
         <p className="text-sm cardPara mb-6">
             {description}
         </p>
-        <div className='mb-6'>
-          <div className='flex justify-between items-center'>
-            <h4>Progress</h4>
-            <h4>{progress}%</h4>
-          </div>
-          <div className='h-1 w-full relative progressBg'>
-            <div 
-              className={`absolute top-0 left-0 w-[${progressNumber}%] h-full progressCount`}
-              style={{ width: `${progress}%` }}
-            ></div>
+      
+        <div className='flex flex-col justify-between items-center'>
+          <Progress progress={progress} />
+          <div className='w-full flex justify-between items-center'>
+            <ProgressStatus progress={progress} />
+            <button className='hover:underline primary font-bold' onClick={()=>setShowDetail(true)}>View Details &nbsp;</button>
           </div>
         </div>
-        <div className='flex justify-between items-center'>
 
-          <button className={`text-black font-medium text-sm py-1 px-2 inProgress rounded-lg ${progressStyle}`}>
-            {progressStatus}
-          </button>
-          <Link href={`${file_id}`} className='hover:underline primary font-bold'>View Details &nbsp;</Link>
+        {showDetail && <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center overflow-y-scroll pt-40 sm:pt-10 md:pt-0 custom-scrollbar"
+        >
+            <ProjectDetail project={project} setShowDetail={setShowDetail} showDetail={showDetail} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} />
         </div>
+
+        }
 
     </div>
   )

@@ -3,6 +3,7 @@ import { axiosPrivate } from '@/services/axios';
 import z, { ZodError } from 'zod';
 import { cookies } from "next/headers";
 import { AxiosError } from 'axios';
+// import { revalidatePath } from 'next/cache';
 
 type UploadResponse = {
     message: string | null;
@@ -105,6 +106,31 @@ export const GetFile = async () => {
         });
         
         
+        return {data};
+    }catch(error){
+
+    if(error){
+        return {
+            message: '',
+            errors: { root: ["Something went wrong. Please try again!"] },
+        };
+    }
+    }
+}
+
+export const DeleteFile = async (fileId:string) => {
+    const cookieStore = await cookies();
+    const accessTokenCookie = cookieStore.get("accessToken")?.value;
+    
+    try{
+
+        const {data} = await axiosPrivate.delete(`/delete/${fileId}`,{
+            headers: {
+                Authorization: `Bearer ${accessTokenCookie}`, 
+            },
+        });
+        
+        // revalidatePath("/projects")
         return {data};
     }catch(error){
 

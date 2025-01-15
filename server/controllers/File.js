@@ -2,6 +2,7 @@ import { uploadFileToS3 } from "../utils/uploadToS3.js";
 import { BadRequestError, ConventionError, UnauthenticatedError, NoContentError, ForbiddenError } from '../errors/index.js';
 import { queryDb } from "../DB_methods/query.js";
 import { generatePresignedUrl } from "../utils/generatePreSignedUrl.js";
+import { deleteFileFromS3 } from "../utils/deleteFromS3.js";
 
 export const UploadFile = async(req,res,next) => {
     const { userId } = req.user;
@@ -61,3 +62,25 @@ export const getUserFiles = async (req, res) => {
 
     // res.status(200).json({ files: filesWithUrls });
 };
+
+export const deleteFile = async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.user;
+
+    const file = await queryDb(`SELECT * FROM files WHERE file_id = ?`, [id]);
+
+    if (!file.length) {
+        throw new BadRequestError("File not found.");
+    }
+
+    if (file[0].user_id !== userId) {
+        throw new UnauthenticatedError("Unauthorized");
+    }
+
+    await deleteFileFromS3(file[0].file_key);
+
+    await queryDb(`DELETE FROM files WHERE file_id = ?`, [id]);
+
+    res.status(200).json({ status: true, message: "The file was deleted successfully."});
+};
+

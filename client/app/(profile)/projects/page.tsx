@@ -68,8 +68,6 @@ const Dashboard = () => {
   return (
     <div className="background p-10 rounded-lg w-full min-h-screen mb-20 sm:w-full">
         <h1 className="text-2xl font-bold mb-3">Projects</h1>
-      {/* <header className="secondaryBg w-full h-10 flex justify-between items-center px-3 rounded-lg mb-3">
-      </header> */}
       <header className="secondaryBg w-full h-15 flex justify-center sm:justify-end items-center py-3 px-6 rounded-lg">
           <div className="flex sm:flex-row gap-4 items-center">
             <form onSubmit={(e) => e.preventDefault()}>
@@ -117,7 +115,7 @@ const Dashboard = () => {
       </header>
       <main className="grid grid-cols-6 mt-4 gap-4">
         {filteredProjects.length > 0 ? (
-          filteredProjects.map((project) => <ProjectCard key={project.file_id} project={project} />)
+          filteredProjects.map((project) => <ProjectCard key={project.file_id} project={project} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} />)
         ) : (
           <p className="col-span-6 text-center text-gray-500">{loading ? "Loading...":"No projects found."}</p>
         )}
