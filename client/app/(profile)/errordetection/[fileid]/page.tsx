@@ -11,6 +11,7 @@ import { Download } from 'lucide-react'
 import { CiWarning } from "react-icons/ci";
 import { PiWarningCircleLight } from "react-icons/pi";
 import { IoCloseCircleOutline } from "react-icons/io5";
+import { BsStars } from "react-icons/bs";
 import Link from 'next/link'
 
 const errorDetection: ErrorDetectionType[] = [
@@ -300,7 +301,7 @@ const ErrorDetection = () => {
                 color: '#FFFFFF',
               }}
             >
-              <Link href='#'>Clean Data</Link>
+              <Link href='#'><BsStars />Clean Data</Link>
             </Button>
             <Button
               className='primaryBg primaryBtnTxt transition-all duration-300 hover:brightness-110 active:brightness-90 flex items-center gap-2'
