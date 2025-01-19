@@ -35,9 +35,6 @@ const chartConfig = {
 
 
 function HallowPieChartComponent() {
-    const totalVisitors = React.useMemo(() => {
-        return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-    }, [])
 
     return (
         <Card className="flex flex-col border-0">
