@@ -6,7 +6,27 @@ export interface projectType {
     progress:number;
 }
 
+export interface IssueDistributionType  {
+    IssueType:string;
+    IssueDetected: number;
+    fill:string;
+  }
 
+export interface ColumnProblem {
+  column: string;
+  numberOfProblems: number;
+}
+
+export interface ErrorDetectionType {
+  DataInconsistency: string;
+  DetectionStatus: number;
+  ImpactLevel: string;
+  Questions: string;
+  HowManyDetected: number;
+  AffectedPercentage: string;
+  FieldColumnName: string[];
+  RecommendedAction: string;
+}
 
 
 

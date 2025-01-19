@@ -9,6 +9,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { DeleteFile } from '@/utils/fileActions';
+import Link from 'next/link';
 
 
 const ProjectDetail = ({project, setShowDetail, showDetail, setRevalidateProjects, revalidateProjects}:{project:projectType, setShowDetail:React.Dispatch<React.SetStateAction<boolean>>, showDetail:boolean, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean}) => {
@@ -52,10 +53,10 @@ const ProjectDetail = ({project, setShowDetail, showDetail, setRevalidateProject
             </div>
         </div>
         <div className='flex flex-col gap-2 items-center'>
-            <button type='submit' className='w-full primaryBtn flex gap-3 items-center text-center text-base' disabled={loading}>
+            <Link href={`/errordetection/${file_id}`} type='submit' className='w-full primaryBtn flex gap-3 items-center text-center text-base'>
                 <BiError  className='font-bold text-xl' />
                 Error Detection
-            </button>
+            </Link>
             <button type='submit' className='w-full primaryBtn flex gap-3 items-center text-center bg-red-600 text-base' disabled={loading} onClick={handleDelete}>
                 {loading ? (
                     <AiOutlineLoading3Quarters className='animate-spin text-xl' />
