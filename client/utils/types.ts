@@ -29,6 +29,14 @@ export interface ErrorDetectionType {
 }
 
 
+export type Props = {
+  params: {
+    fileid: string;
+  };
+};
+
+
+
 
 
 // // types.ts

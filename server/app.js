@@ -38,13 +38,23 @@ app.use(helmet());
 app.use(xss());
 
 // General Middleware
+// app.use(
+//   fileUpload({
+//     useTempFiles: true,
+//     tempFileDir: '/tmp/',
+//     createParentPath: true,
+//   })
+// );
+
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: '/tmp/',
+    tempFileDir: path.join(__dirname, 'tmp'), 
     createParentPath: true,
+    debug: true, // Enables debugging logs from express-fileupload
   })
 );
+
 
 app.use(cookieParser());
 app.use(express.json());

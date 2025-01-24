@@ -1,10 +1,10 @@
-import s3 from "../config/s3.js";
+import fs from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import s3 from "../config/s3.js";
 import { BadRequestError } from "../errors/index.js";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
 
-// Allowed file types
 const allowedTypes = ["csv", "xls", "xlsx"];
 const maxFileSize = 100 * 1024 * 1024; // 100MB
 
@@ -25,14 +25,16 @@ export const uploadFileToS3 = async (req, fieldName) => {
         throw new BadRequestError("Invalid file type. Only CSV and Excel files are allowed.");
     }
 
-    // Generate unique file name
     const uniqueFileName = `${fileExt}/${uuidv4()}-${uploadedFile.name}`;
+
+    // Read file from temporary storage
+    const fileData = fs.readFileSync(uploadedFile.tempFilePath);
 
     const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: uniqueFileName,
-        Body: uploadedFile.data,
-        ContentType: uploadedFile.mimetype,
+        Body: fileData,
+        ContentType: uploadedFile.mimetype || "application/octet-stream",
     };
 
     try {
@@ -41,7 +43,7 @@ export const uploadFileToS3 = async (req, fieldName) => {
             fileKey: uniqueFileName,
             originalName: uploadedFile.name,
             fileType: fileExt,
-            fileSize: fileSize
+            fileSize: fileSize,
         };
     } catch (error) {
         console.error("File upload to S3 failed:", error);

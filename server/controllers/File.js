@@ -26,7 +26,12 @@ export const UploadFile = async(req,res,next) => {
     );
 
     if (newFile.affectedRows) {
-        return res.status(201).json({ status: true, message: "Uploaded successfully" });
+        return res
+                .status(201)
+                .json({ 
+                    status: true, 
+                    message: "Uploaded successfully" 
+                });
     } else {
         return next(new Error("Failed to register user."));
     } 
@@ -42,10 +47,17 @@ export const getUserFiles = async (req, res) => {
     );
 
     if (userFiles.length === 0) {
-        return res.status(200).json({ status: false, message: "No file uploaded yet" });
+        return res.status(200).json({ 
+            status: false, 
+            message: "No file uploaded yet" 
+        });
     }
 
-    return res.status(200).json({ status: true, message: "Fetched successfully", result:userFiles });
+    return res.status(200).json({ 
+        status: true, 
+        message: "Fetched successfully", 
+        result:userFiles 
+    });
 
     // Generate pre-signed URLs for each file
     // const filesWithUrls = await Promise.all(
@@ -81,6 +93,11 @@ export const deleteFile = async (req, res) => {
 
     await queryDb(`DELETE FROM files WHERE file_id = ?`, [id]);
 
-    res.status(200).json({ status: true, message: "The file was deleted successfully."});
+    res
+        .status(200)
+        .json({ 
+            status: true, 
+            message: "The file was deleted successfully."
+        });
 };
 

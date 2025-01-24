@@ -33,7 +33,12 @@ export const Register = async (req, res, next) => {
     const postResult = await queryDb(insertSql, [email, firstName, lastName, hashedPassword]);
 
     if (postResult.affectedRows) {
-        return res.status(201).json({ status: true, message: "Registered successfully" });
+        return res
+                .status(201)
+                .json({ 
+                    status: true, 
+                    message: "Registered successfully" 
+                });
     } else {
         return next(new Error("Failed to register user."));
     }
@@ -53,7 +58,9 @@ export const Login = async (req, res, next) => {
     const queryResult = await queryDb(sql, [email]);
 
     if (queryResult.length === 0) {
-        return res.status(200).json({ EmailMatch: false });
+        return res
+                .status(200)
+                .json({ EmailMatch: false });
     }
 
     const isMatch = await bcrypt.compare(password, queryResult[0].password);
@@ -62,7 +69,12 @@ export const Login = async (req, res, next) => {
         const { user_id, email, first_name, last_name } = queryResult[0];
 
         // Create access token
-        const payload = { userId:user_id, email, firstName:first_name, lastName:last_name };
+        const payload = { 
+            userId:user_id, 
+            email, 
+            firstName:first_name, 
+            lastName:last_name 
+        };
         const { accessToken, refreshToken } = tokenService(payload);
 
         // Store refresh token in the database
@@ -72,14 +84,26 @@ export const Login = async (req, res, next) => {
         // Set refresh token in cookies
         res.cookie('dataCleaningJWT', refreshToken, {
             httpOnly: true,
-            maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+            maxAge: 3 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
         });
 
-        return res.status(200).json({ EmailMatch: true, PasswordMatch: true, payload, accessToken });
+        return res
+                .status(200)
+                .json({ 
+                    EmailMatch: true, 
+                    PasswordMatch: true, 
+                    payload, 
+                    accessToken 
+                });
     } else {
-        return res.status(200).json({ EmailMatch: true, PasswordMatch: false });
+        return res
+                .status(200)
+                .json({ 
+                    EmailMatch: true, 
+                    PasswordMatch: false 
+                });
     }
 };
 

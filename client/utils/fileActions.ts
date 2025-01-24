@@ -92,7 +92,6 @@ export const UploadFile = async (state: UploadResponse, formData: FormData): Pro
         
 }
 
-
 export const GetFile = async () => {
     const cookieStore = await cookies();
     const accessTokenCookie = cookieStore.get("accessToken")?.value;
@@ -104,7 +103,6 @@ export const GetFile = async () => {
                 Authorization: `Bearer ${accessTokenCookie}`, 
             },
         });
-        
         
         return {data};
     }catch(error){
@@ -140,5 +138,25 @@ export const DeleteFile = async (fileId:string) => {
             errors: { root: ["Something went wrong. Please try again!"] },
         };
     }
+    }
+}
+
+export const ErrorReport = async(fileId:string) => {
+    const cookieStore = await cookies();
+    const accessTokenCookie = cookieStore.get("accessToken")?.value;
+    
+    try{
+
+        const {data} = await axiosPrivate.post("/errordetection",{fileId},{
+            headers: {
+                Authorization: `Bearer ${accessTokenCookie}`, 
+            },
+        });
+        
+        return {data};
+    }catch(error){
+
+        console.log(error);
+        
     }
 }

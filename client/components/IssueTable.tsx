@@ -38,13 +38,13 @@ function IssueTable({errorDetection}:{errorDetection:ErrorDetectionType[]}) {
                 <TableCell className="text-right flex gap-2 flex-wrap justify-end">
                 {
                     error.FieldColumnName.slice(0,2).map((column,errorIndex) => (
-                        <span key={errorIndex} className="rounded-lg bg-red-400 p-1 m-1">
+                        <div key={errorIndex} className="rounded-lg bg-red-400 p-1 m-1 inline-block" style={{ verticalAlign: 'middle' }}>
                             {column}{errorIndex !== error.FieldColumnName.length-1?' ':''}
-                        </span>
+                        </div>
                 ))}
                 {
                     ( showModal === index && error.FieldColumnName.slice(2).map((column,errorIndex) => (
-                        <span key={errorIndex} className="rounded-lg bg-red-400 p-1 m-1">
+                        <span key={errorIndex} className="rounded-lg bg-red-400 p-1 m-1 inline-block" style={{ verticalAlign: 'middle' }}>
                             {column}{errorIndex !== error.FieldColumnName.length-1?' ':''}
                         </span>)
                 ))}
@@ -52,7 +52,7 @@ function IssueTable({errorDetection}:{errorDetection:ErrorDetectionType[]}) {
                     (
                         showModal === index 
                             ? <span key={index} className="rounded-lg primaryBg p-1 m-1 cursor-pointer" onClick={()=>setShowModal(-1)}>show less</span>
-                            : <span key={index} className="rounded-lg primaryBg p-1 m-1 cursor-pointer" onClick={()=>setShowModal(index)}>{(error.FieldColumnName.slice(3).length + 1) + '+ more'}</span>
+                            : <span key={index} className="rounded-lg primaryBg p-1 m-1 cursor-pointer inline-block" style={{ verticalAlign: 'middle' }} onClick={()=>setShowModal(index)}>{(error.FieldColumnName.slice(3).length + 1) + '+ more'}</span>
                     )
                     }
                 </TableCell>
