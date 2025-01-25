@@ -48,34 +48,39 @@ const ErrorDetection = ({params}:Props) => {
     totalPercentage: 0,
     totalDistinctColumns: 0,
   });
-  // const [fileId, setFileId] = useState<string>("");
-
-  const fileId = params?.fileid;
-
-  console.log(fileId);
+  const [fileId, setFileId] = useState<string>("");
 
   useEffect(() => {
     const fetchErrorReport = async () => {
-      try {
-        const result = await ErrorReport(fileId);
-        
-        if (result.success) {
-          setFileDetails(result.data.fileDetails);
-          setErrorDetection(result.data.detectionResults);
-        } else {
-          console.error('Error in processing file:', result.message);
+      const fileId = await params;
+      const { fileid } = fileId;
+
+      console.log("fileid ",fileid);
+      
+      
+      if(fileid){
+        setFileId(fileid);
+
+        try {
+          const result = await ErrorReport(fileid);
+          
+          if (result.success) {
+            setFileDetails(result.data.fileDetails);
+            setErrorDetection(result.data.detectionResults);
+          } else {
+            console.error('Error in processing file:', result.message);
+          }
+        } catch (error) {
+          console.error('Unexpected error:', error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Unexpected error:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    if (fileId) {
-      fetchErrorReport();
-    }
-  }, [fileId]);
+    fetchErrorReport();
+  
+  }, [params]);
 
   useEffect(() => {
     const computeValues = () => {
@@ -147,6 +152,7 @@ const ErrorDetection = ({params}:Props) => {
     return <div>Loading...</div>;
   }
 
+  console.log("fileId ",fileId);
   console.log("computedData ",computedData);
   console.log("Error Detection ",errorDetection);
 

@@ -30,11 +30,10 @@ export interface ErrorDetectionType {
 
 
 export type Props = {
-  params: {
-    fileid: string;
-  };
+  params: Promise<{
+    fileid: string | undefined;
+  }>;
 };
-
 
 export interface fileDetailsType {
   original_name: string;
