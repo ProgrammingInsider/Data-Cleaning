@@ -28,7 +28,8 @@ function IssueTable({errorDetection}:{errorDetection:ErrorDetectionType[]}) {
         </TableHeader>
         <TableBody>
             {errorDetection
-            .filter(error => error.DetectionStatus === 1) 
+            .filter(error => error.DetectionStatus === 1)
+            .filter(error => error.HowManyDetected > 0) 
             .map((error,index) => (
             <TableRow key={index}>
                 <TableCell className="font-medium w-40">{error.DataInconsistency}</TableCell>

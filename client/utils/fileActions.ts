@@ -141,22 +141,88 @@ export const DeleteFile = async (fileId:string) => {
     }
 }
 
-export const ErrorReport = async(fileId:string) => {
+// export const ErrorReport = async(fileId:string) => {
+//     const cookieStore = await cookies();
+//     const accessTokenCookie = cookieStore.get("accessToken")?.value;
+    
+//     try{
+
+//         const {data} = await axiosPrivate.post("/errordetection",{fileId},{
+//             headers: {
+//                 Authorization: `Bearer ${accessTokenCookie}`, 
+//             },
+//         });
+        
+//         return {data};
+//     }catch(error){
+
+//         console.log(error);
+        
+//     }
+// }
+
+
+interface ErrorResponse {
+    message?: string;
+}
+
+export const ErrorReport = async (fileId: string) => {
     const cookieStore = await cookies();
     const accessTokenCookie = cookieStore.get("accessToken")?.value;
-    
-    try{
 
-        const {data} = await axiosPrivate.post("/errordetection",{fileId},{
-            headers: {
-                Authorization: `Bearer ${accessTokenCookie}`, 
-            },
-        });
-        
-        return {data};
-    }catch(error){
+    try {
+        const { data } = await axiosPrivate.post(
+            "/errordetection",
+            { fileId },
+            {
+                headers: {
+                    Authorization: `Bearer ${accessTokenCookie}`,
+                },
+            }
+        );
 
-        console.log(error);
-        
+        if (data.status === true) {
+            return { success: true, data };
+        } else {
+            console.error("Error detected in response:", data.message);
+            return { success: false, message: data.message || "Unknown error occurred" };
+        }
+    } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+            const { response } = error as AxiosError<ErrorResponse>;
+
+            if (response) {
+                const { status, data } = response;
+
+                if (status === 400) {
+                    console.error("Bad request error:", data?.message || "Invalid request parameters.");
+                    return { success: false, message: data?.message || "Bad request." };
+                }
+
+                if (status === 401) {
+                    console.error("Unauthorized access:", data?.message || "Invalid or expired token.");
+                    return { success: false, message: data?.message || "Unauthorized access." };
+                }
+
+                if (status === 404) {
+                    console.error("Resource not found:", data?.message || "File not found.");
+                    return { success: false, message: data?.message || "File not found." };
+                }
+
+                if (status === 500) {
+                    console.error("Internal server error:", data?.message || "An error occurred on the server.");
+                    return { success: false, message: data?.message || "Internal server error." };
+                }
+
+                console.error("Unhandled status:", status, "Message:", data?.message);
+                return { success: false, message: data?.message || "An unexpected error occurred." };
+            } else if (error.request) {
+                console.error("No response from server. Possible network error.");
+                return { success: false, message: "No response from server. Please check your network." };
+            }
+        }
+
+        console.error("Error in request setup:", (error as Error).message);
+        return { success: false, message: (error as Error).message || "Request setup failed." };
     }
-}
+};

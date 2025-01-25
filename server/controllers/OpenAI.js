@@ -39,8 +39,6 @@ export const ErrorDetection = async (req, res) => {
             message: "Parsed data is invalid or empty" 
         });
     }
-
-    // 
     
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -54,7 +52,7 @@ export const ErrorDetection = async (req, res) => {
     })
 
     // Log the response for debugging
-    console.log("OpenAI Response:", JSON.stringify(response, null, 2));
+    // console.log("OpenAI Response:", JSON.stringify(response, null, 2));
 
 
      // Validate OpenAI response
@@ -71,6 +69,6 @@ export const ErrorDetection = async (req, res) => {
         status: true, 
         message: "Fetched successfully", 
         fileDetails: userFiles, 
-        detectionResults: result 
+        detectionResults:  JSON.parse(result).DataInconsistencies
     });
 }

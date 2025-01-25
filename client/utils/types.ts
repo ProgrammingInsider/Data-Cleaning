@@ -36,6 +36,11 @@ export type Props = {
 };
 
 
+export interface fileDetailsType {
+  original_name: string;
+  description: string;
+}
+
 
 
 
