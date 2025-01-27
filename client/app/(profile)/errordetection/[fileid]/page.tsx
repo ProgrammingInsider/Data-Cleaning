@@ -119,7 +119,9 @@ const ErrorDetection = ({params}:Props) => {
         .filter((issue) => issue.HowManyDetected > 0)
         .reduce((acc, issue) => acc + issue.HowManyDetected, 0);
 
-      const highImpactCount = errorDetection.filter((issue) => issue.ImpactLevel === 'High').length;
+      const highImpactCount = errorDetection
+        .filter((issue) => issue.HowManyDetected > 0)
+        .filter((issue) => issue.ImpactLevel === 'High').length;
 
       const totalPercentage = errorDetection
         .filter((issue) => issue.DetectionStatus === 1)

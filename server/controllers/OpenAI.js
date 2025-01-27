@@ -41,7 +41,7 @@ export const ErrorDetection = async (req, res) => {
     }
     
     const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: await messages(parsedData),
         max_tokens: max_completion_tokens,
         temperature: temperature,
