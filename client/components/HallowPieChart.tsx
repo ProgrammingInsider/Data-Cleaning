@@ -65,7 +65,7 @@ function HallowPieChartComponent({ totalPercentage }: { totalPercentage: number 
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {(100 - totalPercentage).toFixed(2)}%
+                          {parseFloat((100 - totalPercentage).toFixed(2))}%
                         </tspan>
                         <tspan
                           x={viewBox.cx}
