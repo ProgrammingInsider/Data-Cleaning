@@ -107,8 +107,10 @@ export const response_format = {
     }
   }
 
-export const temperature = 1.08;
-export const max_completion_tokens = 2048;
-export const top_p = 1;
+// export const temperature = 1.08;
+// export const max_completion_tokens = 2048;
+export const temperature = 0;
+export const max_completion_tokens = 16384;
+export const top_p = 0.9;
 export const frequency_penalty = 0;
 export const presence_penalty = 0
