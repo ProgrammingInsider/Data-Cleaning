@@ -166,7 +166,7 @@ const ErrorDetection = ({params}:Props) => {
             <CardHeader className='col-span-1'>
               <CardTitle className='text-4xl font-bold mb-3'>{fileDetails[0]?.original_name || "File Name"}</CardTitle>
               <CardDescription className='mb-48'>{fileDetails[0]?.description || "No description available for this file."}</CardDescription>
-              <CardDescription className='font-normal para text-sm'><b>Summary:</b> The current data quality score is {(100 - computedData.totalPercentage)}%, with {computedData.totalIssues} total issues detected across {computedData.totalDistinctColumns} unique columns. Approximately {computedData.totalPercentage.toFixed(2)}% of the dataset is affected. There are {computedData.highImpactCount} high-impact issues that require immediate attention.</CardDescription>
+              <CardDescription className='font-normal para text-sm'><b>Summary:</b> The current data quality score is {parseFloat((100 - computedData.totalPercentage).toFixed(2))}%, with {computedData.totalIssues} total issues detected across {computedData.totalDistinctColumns} unique columns. Approximately {computedData.totalPercentage.toFixed(2)}% of the dataset is affected. There are {computedData.highImpactCount} high-impact issues that require immediate attention.</CardDescription>
             </CardHeader>
             <CardContent className='col-span-1'>
               <HallowPieChartComponent totalPercentage={computedData.totalPercentage}/>
