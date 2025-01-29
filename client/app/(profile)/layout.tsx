@@ -1,4 +1,4 @@
-import SideMenu from "@/components/SideMenu";
+// import SideMenu from "@/components/SideMenu";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ const layout = ({
   }>) => {
   return (
     <main className='flex overflow-x-hidden'>
-        <SideMenu/>
+        {/* <SideMenu/> */}
         <section className="sectionBg p-4 sm:ml-0 w-full min-h-screen sm:w-screen">
           {children}
         </section>

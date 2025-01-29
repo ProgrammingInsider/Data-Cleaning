@@ -35,6 +35,7 @@ export const filesTable = async (pool) => {
         category VARCHAR(255) NOT NULL,
         description VARCHAR(255) NOT NULL,
         progress VARCHAR(255) DEFAULT (0),
+        previous_response JSON DEFAULT NULL,
         file_key VARCHAR(255) NOT NULL UNIQUE,
         file_type VARCHAR(50) NOT NULL,
         file_size BIGINT NOT NULL,

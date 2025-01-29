@@ -1,39 +1,39 @@
-
-// export const messages = async(parsedData) => {
+// export const messages = async (parsedData) => {
 //   return [
 //     {
 //       "role": "system",
-//       "content": [
-//         {
-//           "text": "The Data Inconsistency Detector is a robust error detection platform that helps users identify and resolve data quality issues in their datasets. When a customer uploads a CSV file, the app scans the data for inconsistencies and generates a comprehensive report in JSON format. The report includes:\n\nData Inconsistency Types: A predefined list of potential issues (e.g., missing fields, duplicates, formatting errors).\n\nDetection Status: Indicates whether the issue was detected (1 for detected, 0 for not detected).\n\nImpact Level: The severity of the issue (High, Medium, Low).\n\nQuestions: Describes the question used to identify the inconsistency.\n\nHow Many Detected: The count of occurrences where the issue exists.\n\nAffected Percentage: The proportion of records affected by the issue.\n\nField/Column Name: Lists the specific fields or columns impacted.\n\nRecommended Action: Suggested steps to resolve or mitigate the issue.\n\nThe app ensures that the output always maintains the same structure, with all predefined inconsistency types included in the results. If no issues are detected for a specific type, the row will still appear in the output with a detection status of 0 and default values for other fields.",
-//           "type": "text"
-//         }
-//       ]
+//       "content": "The Data Inconsistency Detector is a robust error detection platform that helps users identify and resolve data quality issues in their datasets. When a customer uploads a CSV file, the app scans the data for inconsistencies and generates a comprehensive report in JSON format. The report includes:\n\nData Inconsistency Types: A predefined list of potential issues (e.g., missing fields, duplicates, formatting errors).\n\nDetection Status: Indicates whether the issue was detected (1 for detected, 0 for not detected).\n\nImpact Level: The severity of the issue (High, Medium, Low).\n\nQuestions: Describes the question used to identify the inconsistency.\n\nHow Many Detected: The count of occurrences where the issue exists.\n\nAffected Percentage: The proportion of records affected by the issue.\n\nField/Column Name: Lists the specific fields or columns impacted.\n\nRecommended Action: Suggested steps to resolve or mitigate the issue.\n\nThe app ensures that the output always maintains the same structure, with all predefined inconsistency types included in the results. If no issues are detected for a specific type, the row will still appear in the output with a detection status of 0 and default values for other fields."
 //     },
 //     {
 //       "role": "user",
-//       "content": [
-//         {
-//           "text": parsedData,
-//           "type": "object"
-//         }
-//       ]
+//       "content": JSON.stringify(parsedData)
 //     },
-//   ]
-// } 
-export const messages = async (parsedData) => {
-  return [
-    {
-      "role": "system",
-      "content": "The Data Inconsistency Detector is a robust error detection platform that helps users identify and resolve data quality issues in their datasets. When a customer uploads a CSV file, the app scans the data for inconsistencies and generates a comprehensive report in JSON format. The report includes:\n\nData Inconsistency Types: A predefined list of potential issues (e.g., missing fields, duplicates, formatting errors).\n\nDetection Status: Indicates whether the issue was detected (1 for detected, 0 for not detected).\n\nImpact Level: The severity of the issue (High, Medium, Low).\n\nQuestions: Describes the question used to identify the inconsistency.\n\nHow Many Detected: The count of occurrences where the issue exists.\n\nAffected Percentage: The proportion of records affected by the issue.\n\nField/Column Name: Lists the specific fields or columns impacted.\n\nRecommended Action: Suggested steps to resolve or mitigate the issue.\n\nThe app ensures that the output always maintains the same structure, with all predefined inconsistency types included in the results. If no issues are detected for a specific type, the row will still appear in the output with a detection status of 0 and default values for other fields."
-    },
-    {
-      "role": "user",
-      "content": JSON.stringify(parsedData)
-    },
-  ];
-};
+//   ];
+// };
 
+export const messages = async (parsedData, previousResponse = null) => {
+  const userMessage = JSON.stringify(parsedData);
+  const previousResponseMessage = previousResponse
+    ? {
+        role: "assistant",
+        content: JSON.stringify(previousResponse),
+      }
+    : null;
+
+  const messagesArray = [
+    {
+      role: "system",
+      content: "The Data Inconsistency Detector is a robust error detection platform that helps users identify and resolve data quality issues in their datasets. When a customer uploads a CSV file, the app scans the data for inconsistencies and generates a comprehensive report in JSON format. ...",
+    },
+    previousResponseMessage,
+    {
+      role: "user",
+      content: userMessage,
+    },
+  ].filter(Boolean);
+
+  return messagesArray;
+};
 
 export const response_format = {
     "type": "json_schema",
@@ -111,6 +111,6 @@ export const response_format = {
 // export const max_completion_tokens = 2048;
 export const temperature = 0;
 export const max_completion_tokens = 16384;
-export const top_p = 0.9;
+export const top_p = 1.0;
 export const frequency_penalty = 0;
 export const presence_penalty = 0
