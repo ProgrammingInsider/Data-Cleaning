@@ -11,10 +11,12 @@ import { CiWarning } from "react-icons/ci";
 import { PiWarningCircleLight } from "react-icons/pi";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { BsStars } from "react-icons/bs";
+import { BsArrowClockwise } from "react-icons/bs";
 import Link from 'next/link'
 import ExportDropdown from '@/components/ExportDropDown'
 import { ErrorReport} from '@/utils/fileActions'
 import { useEffect, useState } from 'react'
+import Loading from '../loading'
 
 
 const colorMapping: Record<string, string> = {
@@ -40,6 +42,10 @@ const ErrorDetection = ({params}:Props) => {
   const [errorDetection, setErrorDetection] = useState<ErrorDetectionType[]>([]);
   const [fileDetails, setFileDetails] = useState<fileDetailsType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [overallQuality, setOverallQuality] = useState<number>(0);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const [reDetect, setReDetect] = useState<boolean>(false);
   const [computedData, setComputedData] = useState<computeDataType>({
     issueDistribution: [],
     sortedColumnProblemCount: [],
@@ -51,47 +57,61 @@ const ErrorDetection = ({params}:Props) => {
   const [fileId, setFileId] = useState<string>("");
 
   useEffect(() => {
+    console.log("Fetching error report with reDetect:", reDetect);
+
+    if(!reDetect && !initialLoading) return;
     const fetchErrorReport = async () => {
-      const fileId = await params;
-      const { fileid } = fileId;
+        const fileId = await params;
+        const { fileid } = fileId;
+        setIsLoading(true);
 
-      console.log("fileid ",fileid);
-      
-      
-      if(fileid){
-        setFileId(fileid);
-
-        try {
-          const result = await ErrorReport(fileid);
-          
-          if (result.success) {
-            setFileDetails(result.data.fileDetails);
-            setErrorDetection(result.data.detectionResults);
-          } else {
-            console.error('Error in processing file:', result.message);
-          }
-        } catch (error) {
-          console.error('Unexpected error:', error);
-        } finally {
-          setIsLoading(false);
+        if (fileid) {
+            setFileId(fileid);
+            try {
+                const result = await ErrorReport(fileid, reDetect);
+                if (result.success) {
+                    setFileDetails(result.data.fileDetails);
+                    setErrorDetection(result.data.detectionResults);
+                    setOverallQuality(result.data.OverallQualityPercentage);
+                } else {
+                    console.error('Error in processing file:', result.message);
+                }
+            } catch (error) {
+                console.error('Unexpected error:', error);
+            } finally {
+                setIsLoading(false);
+                setReDetect(false); 
+                setInitialLoading(false);
+            }
         }
-      }
     };
 
     fetchErrorReport();
-  
-  }, [params]);
+}, [params, refresh]);
+
+
+  const defaultColors = [
+    "#FF5733", "#33FF57", "#3357FF", "#FF33A5", "#A533FF", 
+    "#FFD133", "#33FFF5", "#5733FF", "#FF8C33", "#FF3333",
+    "#33FF8C", "#8C33FF", "#FFC233", "#33FFC2", "#C233FF",
+    "#FFA733", "#FF33D6", "#33FF7A", "#FF5733", "#5733FF"
+  ];
 
   useEffect(() => {
     const computeValues = () => {
       const issueDistribution = errorDetection
-        .filter((issue) => issue.DetectionStatus === 1)
-        .filter((issue) => issue.HowManyDetected > 0)
-        .map((issue) => ({
+      .filter((issue) => issue.DetectionStatus === 1)
+      .filter((issue) => issue.HowManyDetected > 0)
+      .map((issue, index) => {
+        const color =
+          colorMapping[issue.DataInconsistency] ||
+          defaultColors[index % defaultColors.length];
+        return {
           IssueType: issue.DataInconsistency,
           IssueDetected: issue.HowManyDetected,
-          fill: colorMapping[issue.DataInconsistency] || 'var(--color-default)',
-        }));
+          fill: color,
+        };
+      });
 
       const columnProblemCount = errorDetection
       .filter((issue) => issue.DetectionStatus === 1)
@@ -148,15 +168,11 @@ const ErrorDetection = ({params}:Props) => {
     if (errorDetection.length > 0) {
       setComputedData(computeValues());
     }
-  }, [errorDetection]);
+  }, [errorDetection, reDetect]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (fileId && isLoading) {
+    return <Loading/>
   }
-
-  console.log("fileId ",fileId);
-  console.log("computedData ",computedData);
-  console.log("Error Detection ",errorDetection);
 
   return (
     <div className="background p-10 rounded-lg w-full min-h-screen mb-20 sm:w-full">
@@ -166,10 +182,10 @@ const ErrorDetection = ({params}:Props) => {
             <CardHeader className='col-span-1'>
               <CardTitle className='text-4xl font-bold mb-3'>{fileDetails[0]?.original_name || "File Name"}</CardTitle>
               <CardDescription className='mb-48'>{fileDetails[0]?.description || "No description available for this file."}</CardDescription>
-              <CardDescription className='font-normal para text-sm'><b>Summary:</b> The current data quality score is {parseFloat((100 - computedData.totalPercentage).toFixed(2))}%, with {computedData.totalIssues} total issues detected across {computedData.totalDistinctColumns} unique columns. Approximately {computedData.totalPercentage.toFixed(2)}% of the dataset is affected. There are {computedData.highImpactCount} high-impact issues that require immediate attention.</CardDescription>
+              <CardDescription className='font-normal para text-sm'><b>Summary:</b> The current data quality score is {parseFloat(overallQuality.toFixed(2))}%, with {computedData.totalIssues} total issues detected across {computedData.totalDistinctColumns} unique columns. Approximately {parseFloat((100 - overallQuality).toFixed(2))}% of the dataset is affected. There are {computedData.highImpactCount} high-impact issues that require immediate attention.</CardDescription>
             </CardHeader>
             <CardContent className='col-span-1'>
-              <HallowPieChartComponent totalPercentage={computedData.totalPercentage}/>
+              <HallowPieChartComponent overallQualityPercentage={overallQuality}/>
             </CardContent>
           </Card>
           <div className='flex flex-col gap-3 sm:flex-row'>
@@ -182,7 +198,7 @@ const ErrorDetection = ({params}:Props) => {
                 <b>{computedData.totalIssues}</b>
               </CardContent>
               <CardFooter>
-                <CardDescription>Across 5 categories</CardDescription>
+                <CardDescription>Across {errorDetection.length} categories</CardDescription>
               </CardFooter>
             </Card>
 
@@ -226,6 +242,18 @@ const ErrorDetection = ({params}:Props) => {
             </CardContent>
           </Card>
           <div className='flex justify-end gap-5'>
+            <Button
+              asChild
+              className='secondaryBg transition-all duration-300 hover:brightness-110 active:brightness-90'
+              style={{
+                background: 'linear-gradient(to right, #E94E77, #F35D6E)', // New gradient colors (pinkish tones)
+                color: '#FFFFFF',
+              }}
+              data-ignore="true"
+              onClick={() => (setRefresh(!refresh), setReDetect(true))}
+            >
+              <Link href='#'><BsArrowClockwise />Re Detect</Link>
+            </Button>
             <Button
               asChild
               className='secondaryBg transition-all duration-300 hover:brightness-110 active:brightness-90'

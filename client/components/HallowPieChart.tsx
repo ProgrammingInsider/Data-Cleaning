@@ -13,14 +13,12 @@ import {
 } from "@/components/ui/chart";
 
 
-function HallowPieChartComponent({ totalPercentage }: { totalPercentage: number }) {
-
-  console.log("totalPercentage ",totalPercentage);
+function HallowPieChartComponent({ overallQualityPercentage }: { overallQualityPercentage: number }) {
   
   
   const chartData = [
-    { browser: "quality", visitors: (100 - totalPercentage), fill: "#30D158" },
-    { browser: "problem", visitors: totalPercentage, fill: "#2C2C2E" },
+    { browser: "quality", visitors: overallQualityPercentage, fill: "#30D158" },
+    { browser: "problem", visitors: (100 - overallQualityPercentage), fill: "#2C2C2E" },
   ];
   
   const chartConfig = {
@@ -65,7 +63,7 @@ function HallowPieChartComponent({ totalPercentage }: { totalPercentage: number 
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {parseFloat((100 - totalPercentage).toFixed(2))}%
+                          {parseFloat(overallQualityPercentage.toFixed(2))}%
                         </tspan>
                         <tspan
                           x={viewBox.cx}

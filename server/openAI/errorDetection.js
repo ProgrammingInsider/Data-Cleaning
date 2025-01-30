@@ -42,7 +42,7 @@ export const response_format = {
       "schema": {
         "type": "object",
         "required": [
-          "DataInconsistencies"
+          "DataInconsistencies", "FileQualityScore", "FileQuality"
         ],
         "properties": {
           "DataInconsistencies": {
@@ -99,6 +99,15 @@ export const response_format = {
               "additionalProperties": false
             },
             "description": "List of predefined data inconsistency types and their statuses."
+          },
+          "FileQualityScore": {
+          "type": "number",
+          "description": "A numerical score representing the overall quality of the file, with 100 being perfect."
+        },
+          FileQuality: {
+            type: "string",
+            enum: ["Excellent", "Good", "Fair", "Poor"],
+            description: "A qualitative assessment of the file's overall data quality."
           }
         },
         "additionalProperties": false
@@ -107,8 +116,7 @@ export const response_format = {
     }
   }
 
-// export const temperature = 1.08;
-// export const max_completion_tokens = 2048;
+
 export const temperature = 0;
 export const max_completion_tokens = 16384;
 export const top_p = 1.0;

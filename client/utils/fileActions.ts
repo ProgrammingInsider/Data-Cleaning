@@ -166,14 +166,14 @@ interface ErrorResponse {
     message?: string;
 }
 
-export const ErrorReport = async (fileId: string) => {
+export const ErrorReport = async (fileId: string, ReDetect: boolean) => {
     const cookieStore = await cookies();
     const accessTokenCookie = cookieStore.get("accessToken")?.value;
-
+    
     try {
         const { data } = await axiosPrivate.post(
             "/errordetection",
-            { fileId },
+            { fileId, ReDetect },
             {
                 headers: {
                     Authorization: `Bearer ${accessTokenCookie}`,

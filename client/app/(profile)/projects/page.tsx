@@ -6,6 +6,8 @@ import ProjectCard from "@/components/ProjectCard";
 import { useState, useEffect, useRef } from "react";
 import Upload from "@/components/Upload";
 import { GetFile } from "@/utils/fileActions";
+import Loading from "./loading";
+
 
 interface projectType {
   file_id:string;
@@ -125,7 +127,7 @@ const Dashboard = () => {
         {filteredProjects.length > 0 ? (
           filteredProjects.map((project) => <ProjectCard key={project.file_id} project={project} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} />)
         ) : (
-          <p className="col-span-6 text-center text-gray-500">{loading ? "Loading...":"No projects found."}</p>
+          <p className="col-span-6 text-center text-gray-500">{loading ? <Loading/>:"No projects found."}</p>
         )}
       </main>
        {/* The Overlay Div */}

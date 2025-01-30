@@ -12,7 +12,7 @@ import {
 
 export const ErrorDetection = async (req, res) => {
     const { userId } = req.user;
-    const { fileId } = req.body;
+    const { fileId, ReDetect } = req.body;
     
     // Fetch files from the database
     const userFiles = await queryDb(
@@ -28,7 +28,14 @@ export const ErrorDetection = async (req, res) => {
     }
 
     const fileKey = userFiles[0].file_key;
-    const previousResponse = userFiles[0].previous_response;
+
+    let previousResponse;
+
+    if(!ReDetect){
+        previousResponse = userFiles[0].previous_response;
+    }else{
+        previousResponse = null;
+    }
     
     const parsedData = await ParseS3File({ fileKey })
 
@@ -93,8 +100,6 @@ export const ErrorDetection = async (req, res) => {
         WHERE file_id = ? AND user_id = ?`,
         [JSON.stringify(parsedResponse), fileId, userId]
     );
-    
-    
 
     // response.data.choices[0].message
     return res.status(200).json({ 
@@ -102,5 +107,7 @@ export const ErrorDetection = async (req, res) => {
         message: "Fetched successfully", 
         fileDetails: userFiles, 
         detectionResults:  parsedResponse.DataInconsistencies,
+        OverallQualityPercentage: parsedResponse.FileQualityScore,
+        FileQuality:  parsedResponse.FileQuality,
     });
 }
