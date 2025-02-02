@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -19,15 +18,15 @@ export default async function CleanDataLayout({
         <div className="w-screen h-[calc(100vh-70px)] flex border-t border-b border-gray-800">
             <ResizablePanelGroup direction="horizontal" className="w-full h-full">
                 <ResizablePanel defaultSize={15} className="border-r border-gray-800">
-                    <Suspense>{sidemenu}</Suspense>
+                    {sidemenu}
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={20} className="border-r border-gray-800">
-                    <Suspense>{chat}</Suspense>
+                    {chat}
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={65}>
-                    <Suspense>{table}</Suspense>
+                    {table}
                     {/* <Suspense fallback={<p>Loading table...</p>}>{table}</Suspense> */}
                 </ResizablePanel>
             </ResizablePanelGroup>
