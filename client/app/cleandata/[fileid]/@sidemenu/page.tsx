@@ -65,7 +65,7 @@ export default function SideMenu({params}:Props) {
 
 
     useEffect(()=>{
-        setLoading(true);
+        setLoading(false); //change to true later
         const fetchProject = async() => {
 
         // const resp = await GetFile();
@@ -87,7 +87,7 @@ export default function SideMenu({params}:Props) {
         const fetchErrorReport = async () => {
             const fileId = await params;
             const { fileid } = fileId;
-            setIsLoading(true);
+            setIsLoading(false); //change to true later
 
             if (fileid) {
                 setFileId(fileid);
