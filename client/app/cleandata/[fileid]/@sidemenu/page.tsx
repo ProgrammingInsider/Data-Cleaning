@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
 import { FaFileAlt } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import {Props, ErrorDetectionType, fileDetailsType, IssueDistributionType} from '@/utils/types'
-import { ErrorReport, GetFile } from "@/utils/fileActions";
+// import { ErrorReport, GetFile } from "@/utils/fileActions";
 import { FaBoxTissue } from "react-icons/fa";
 import SmallLoading from "@/components/SmallLoading";
 
@@ -20,10 +20,10 @@ interface projectType {
   }
 
 const mockProject = [
-  {file_id: '8a2ce81c-df0e-11ef-9a99-0e10fb0c69fb', original_name: 'Trip List.xlsx', category: 'Machine Learning', description: 'Tranportation File', progress: '0'},
-  {file_id: '122e4c8f-de7b-11ef-9a99-0e10fb0c69fb', original_name: 'data-cleaning-s3-user_accessKeys.csv', category: 'Artificial Intellegence', description: 'Access Key', progress: '0'},
-  {file_id: '97562a3f-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Customer_Data_with_Inconsistencies.csv', category: 'Machine Learning', description: 'This is my description', progress: '0'},
-  {file_id: '4eba712c-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Diverse_Dataset_with_Errors.csv', category: 'Machine Learning', description: 'This is my description', progress: '0'}
+  {file_id: '8a2ce81c-df0e-11ef-9a99-0e10fb0c69fb', original_name: 'Trip List.xlsx', category: 'Machine Learning', description: 'Tranportation File', progress: 0},
+  {file_id: '122e4c8f-de7b-11ef-9a99-0e10fb0c69fb', original_name: 'data-cleaning-s3-user_accessKeys.csv', category: 'Artificial Intellegence', description: 'Access Key', progress: 0},
+  {file_id: '97562a3f-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Customer_Data_with_Inconsistencies.csv', category: 'Machine Learning', description: 'This is my description', progress: 0},
+  {file_id: '4eba712c-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Diverse_Dataset_with_Errors.csv', category: 'Machine Learning', description: 'This is my description', progress: 0}
 ];
 
 const mockIssue = [
@@ -58,74 +58,77 @@ export default function SideMenu({params}:Props) {
     const [errorDetection, setErrorDetection] = useState<ErrorDetectionType[]>([]);
     const [fileDetails, setFileDetails] = useState<fileDetailsType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [projects, setProjects] = useState<projectType[]>(mockProject);
+    const [projects, setProjects] = useState<projectType[]>([]);
     const [fileId, setFileId] = useState<string>("");
-    const [issue, setIssue] = useState<IssueDistributionType[]>(mockIssue);
+    const [issue, setIssue] = useState<IssueDistributionType[]>([]);
 
 
-    // useEffect(()=>{
-    //     setLoading(true);
-    //     const fetchProject = async() => {
 
-    //     const resp = await GetFile();
+    useEffect(()=>{
+        setLoading(true);
+        const fetchProject = async() => {
+
+        // const resp = await GetFile();
+        setProjects(mockProject)
+        // if(resp?.data.status){
+        //     setProjects(resp.data.result);
+        // }else{
+        //     setProjects([]);
+        // }
+
+        setLoading(false);
+        }
+
+        fetchProject()
+    },[]) 
+
+
+    useEffect(() => {
+        const fetchErrorReport = async () => {
+            const fileId = await params;
+            const { fileid } = fileId;
+            setIsLoading(true);
+
+            if (fileid) {
+                setFileId(fileid);
+                setFileDetails([]);
+                setErrorDetection([]);
+                // try {
+                //     const result = await ErrorReport(fileid, false);
+                //     if (result.success) {
+                //         setFileDetails(result.data.fileDetails);
+                //         setErrorDetection(result.data.detectionResults);
+
+                //     } else {
+                //         console.error('Error in processing file:', result.message);
+                //     }
+                // } catch (error) {
+                //     console.error('Unexpected error:', error);
+                // } finally {
+                //     setIsLoading(false);
+                // }
+            }
+        };
+
+        fetchErrorReport();
+}, [params, fileId]); //fileId will remove later
+
+    useEffect(() => {
+        // const issueDistribution = errorDetection
+        // .filter((issue) => issue.DetectionStatus === 1)
+        // .filter((issue) => issue.HowManyDetected > 0)
+        // .map((issue) => {
+        //     return {
+        //     IssueType: issue.DataInconsistency,
+        //     IssueDetected: issue.HowManyDetected,
+        //     };
+        // });
+
+        // setIssue(issueDistribution);
+        setIssue(mockIssue);
         
-    //     if(resp?.data.status){
-    //         setProjects(resp.data.result);
-    //     }else{
-    //         setProjects([]);
-    //     }
-
-    //     setLoading(false);
-    //     }
-
-    //     fetchProject()
-    // },[])
-
-
-//     useEffect(() => {
-//         const fetchErrorReport = async () => {
-//             const fileId = await params;
-//             const { fileid } = fileId;
-//             setIsLoading(true);
-
-//             if (fileid) {
-//                 setFileId(fileid);
-//                 try {
-//                     const result = await ErrorReport(fileid, false);
-//                     if (result.success) {
-//                         setFileDetails(result.data.fileDetails);
-//                         setErrorDetection(result.data.detectionResults);
-
-//                     } else {
-//                         console.error('Error in processing file:', result.message);
-//                     }
-//                 } catch (error) {
-//                     console.error('Unexpected error:', error);
-//                 } finally {
-//                     setIsLoading(false);
-//                 }
-//             }
-//         };
-
-//         fetchErrorReport();
-// }, [params]);
-
-    // useEffect(() => {
-    //     const issueDistribution = errorDetection
-    //     .filter((issue) => issue.DetectionStatus === 1)
-    //     .filter((issue) => issue.HowManyDetected > 0)
-    //     .map((issue) => {
-    //         return {
-    //         IssueType: issue.DataInconsistency,
-    //         IssueDetected: issue.HowManyDetected,
-    //         };
-    //     });
-
-    //     setIssue(issueDistribution);
-    //     console.log(issueDistribution);
         
-        
-    // }, [errorDetection]);
+    }, [errorDetection,fileDetails]); //fileDetails will remove later
     
     return (
         <div
