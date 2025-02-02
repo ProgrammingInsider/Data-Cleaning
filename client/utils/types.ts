@@ -9,7 +9,7 @@ export interface projectType {
 export interface IssueDistributionType  {
     IssueType:string;
     IssueDetected: number;
-    fill:string;
+    fill?:string;
   }
 
 export interface ColumnProblem {

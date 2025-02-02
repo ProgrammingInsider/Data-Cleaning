@@ -263,7 +263,7 @@ const ErrorDetection = ({params}:Props) => {
               }}
               data-ignore="true"
             >
-              <Link href='#'><BsStars />Clean Data</Link>
+            <Link href={`/cleandata/${fileId}`}><BsStars />Clean Data</Link>
             </Button>
             <ExportDropdown/>
             {/* <div className="mt-5">
