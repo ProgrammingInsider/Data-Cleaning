@@ -1,5 +1,6 @@
 "use client"
 
+import CleanDataTableHeader from "@/components/CleanDataTableHeader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Table,
@@ -11,6 +12,7 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
+import { useGlobalContext } from "@/context/context"
   
   const invoices = [
     {
@@ -142,10 +144,13 @@ import {
   ]
   
   export default function TablePage() {
+    const {expand, setExpand} = useGlobalContext();
+
     return (
-    <div className="w-full h-[calc(100vh-100px)] overflow-x-auto">
+    <div className={`w-full overflow-hidden ${expand ? 'fixed background inset-0 z-50 top-0 left-0 right-0 bottom-0 overflow-hidden': 'h-[calc(100vh-100px)]'}`}>
+      <CleanDataTableHeader setExpand={setExpand} expand={expand}/>
         <ScrollArea className="w-full h-full overflow-y-scroll">
-        <div className="w-full">
+        <div className="w-full overflow-hidden">
             <Table className="w-full min-w-[800px]">
             <TableCaption>A list of your recent invoices.</TableCaption>
             <TableHeader>

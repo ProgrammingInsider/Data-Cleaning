@@ -1,10 +1,14 @@
+"use client"
+
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { useGlobalContext } from "@/context/context";
+import { useEffect } from "react";
 
-export default async function CleanDataLayout({
+export default function CleanDataLayout({
     sidemenu,
     chat,
     table,
@@ -12,24 +16,42 @@ export default async function CleanDataLayout({
     sidemenu: React.ReactNode;
     chat: React.ReactNode;
     table: React.ReactNode;
-}) {
-        
+}) {        
+    const {expand} = useGlobalContext();
+
+    useEffect(() => {
+        if (expand) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [expand]);
+
+
     return (
-        <div className="w-screen h-[calc(100vh-70px)] flex border-t border-b border-gray-800">
-            <ResizablePanelGroup direction="horizontal" className="w-full h-full">
-                <ResizablePanel defaultSize={15} className="border-r border-gray-800">
-                    {sidemenu}
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={20} className="border-r border-gray-800">
-                    {chat}
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={65}>
-                    {table}
-                    {/* <Suspense fallback={<p>Loading table...</p>}>{table}</Suspense> */}
-                </ResizablePanel>
-            </ResizablePanelGroup>
+        <div className={`w-screen flex border-t border-b border-gray-800 ${expand || 'h-[calc(100vh-70px)]'}`}>
+            {expand ? (
+                <div className="fixed inset-0 z-50">{table}</div>
+            ) : (
+                // Normal layout when not expanded
+                <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+                    <ResizablePanel defaultSize={15} className="border-r border-gray-800">
+                        {sidemenu}
+                    </ResizablePanel>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel defaultSize={20} className="border-r border-gray-800">
+                        {chat}
+                    </ResizablePanel>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel defaultSize={65} className="sticky right-0 overflow-x-auto">
+                        {table}
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            )}
         </div>
     );
 }

@@ -177,7 +177,7 @@ export default function SideMenu({params}:Props) {
                                             {file.original_name}
                                         </span>
                                     </Link>
-                                    {(active === index) && <div className="absolute right-0 text-sm p-1 rounded-full z-20 sectionBg"><FaPlus/></div>}
+                                    {(active === index) && <div className="absolute right-0 text-sm p-1 rounded-full z-10 sectionBg"><FaPlus/></div>}
                                 </li>
                             ))
                         }
@@ -212,7 +212,7 @@ export default function SideMenu({params}:Props) {
                                             {eachIssue.IssueType}
                                         </span>
                                     </Link>
-                                    <div className="absolute top-0 right-0 bottom-0 text-base py-1 px-2 z-20 sectionBg">{eachIssue.IssueDetected
+                                    <div className="absolute top-0 right-0 bottom-0 text-base py-1 px-2 z-10 sectionBg">{eachIssue.IssueDetected
                                     }</div>
                                 </li>
                             ))

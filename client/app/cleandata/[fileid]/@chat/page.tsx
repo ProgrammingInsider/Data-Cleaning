@@ -61,7 +61,7 @@ export default function Chat() {
                 </ScrollArea>
             </CardContent>
 
-            <div className="flex sticky bottom-0 border-t border-gray-800">
+            <div className="flex sticky bottom-0 border-t border-gray-800 z-10">
                 <div className="secondaryBg m-1 p-2 rounded-lg flex items-start gap-1 w-full">
                     {/* Attach File Button */}
                     <button

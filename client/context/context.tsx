@@ -11,12 +11,16 @@ interface Payload {
 interface UserContextType {
     user: Payload | null;
     setUser: React.Dispatch<React.SetStateAction<Payload | null>>;
+    expand: boolean;
+    setExpand:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
 
 const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
     const [user, setUser] = useState<Payload | null>(null);
+    const [expand, setExpand] = useState<boolean>(false);
+
 
     useEffect(() => {
         const getUserFromCookies = () => {
@@ -41,7 +45,7 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
     }, [user]);
 
     return (
-        <UserContext.Provider value={{user, setUser}}>
+        <UserContext.Provider value={{user, setUser, expand, setExpand}}>
             {children}
         </UserContext.Provider>
     )
