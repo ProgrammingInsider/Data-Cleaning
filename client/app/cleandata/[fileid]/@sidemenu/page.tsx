@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import {Props, ErrorDetectionType, fileDetailsType, IssueDistributionType} from '@/utils/types'
-// import { ErrorReport, GetFile } from "@/utils/fileActions";
+import { ErrorReport, GetFile } from "@/utils/fileActions";
 import { FaBoxTissue } from "react-icons/fa";
 import SmallLoading from "@/components/SmallLoading";
 
@@ -19,35 +19,35 @@ interface projectType {
     progress:number;
   }
 
-const mockProject = [
-  {file_id: '8a2ce81c-df0e-11ef-9a99-0e10fb0c69fb', original_name: 'Trip List.xlsx', category: 'Machine Learning', description: 'Tranportation File', progress: 0},
-  {file_id: '122e4c8f-de7b-11ef-9a99-0e10fb0c69fb', original_name: 'data-cleaning-s3-user_accessKeys.csv', category: 'Artificial Intellegence', description: 'Access Key', progress: 0},
-  {file_id: '97562a3f-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Customer_Data_with_Inconsistencies.csv', category: 'Machine Learning', description: 'This is my description', progress: 0},
-  {file_id: '4eba712c-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Diverse_Dataset_with_Errors.csv', category: 'Machine Learning', description: 'This is my description', progress: 0}
-];
+// const mockProject = [
+//   {file_id: '8a2ce81c-df0e-11ef-9a99-0e10fb0c69fb', original_name: 'Trip List.xlsx', category: 'Machine Learning', description: 'Tranportation File', progress: 0},
+//   {file_id: '122e4c8f-de7b-11ef-9a99-0e10fb0c69fb', original_name: 'data-cleaning-s3-user_accessKeys.csv', category: 'Artificial Intellegence', description: 'Access Key', progress: 0},
+//   {file_id: '97562a3f-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Customer_Data_with_Inconsistencies.csv', category: 'Machine Learning', description: 'This is my description', progress: 0},
+//   {file_id: '4eba712c-de3c-11ef-9a99-0e10fb0c69fb', original_name: 'Diverse_Dataset_with_Errors.csv', category: 'Machine Learning', description: 'This is my description', progress: 0}
+// ];
 
-const mockIssue = [
-    {
-        "IssueType": "Missing Values",
-        "IssueDetected": 15
-    },
-    {
-        "IssueType": "Invalid Date Format",
-        "IssueDetected": 10
-    },
-    {
-        "IssueType": "Negative Values",
-        "IssueDetected": 8
-    },
-    {
-        "IssueType": "Error or Invalid Entries",
-        "IssueDetected": 20
-    },
-    {
-        "IssueType": "Outliers Detected",
-        "IssueDetected": 12
-    }
-]
+// const mockIssue = [
+//     {
+//         "IssueType": "Missing Values",
+//         "IssueDetected": 15
+//     },
+//     {
+//         "IssueType": "Invalid Date Format",
+//         "IssueDetected": 10
+//     },
+//     {
+//         "IssueType": "Negative Values",
+//         "IssueDetected": 8
+//     },
+//     {
+//         "IssueType": "Error or Invalid Entries",
+//         "IssueDetected": 20
+//     },
+//     {
+//         "IssueType": "Outliers Detected",
+//         "IssueDetected": 12
+//     }
+// ]
 
 
 export default function SideMenu({params}:Props) {
@@ -65,16 +65,16 @@ export default function SideMenu({params}:Props) {
 
 
     useEffect(()=>{
-        setLoading(false); //change to true later
+        setLoading(true); //change to false to mock later
         const fetchProject = async() => {
 
-        // const resp = await GetFile();
-        setProjects(mockProject)
-        // if(resp?.data.status){
-        //     setProjects(resp.data.result);
-        // }else{
-        //     setProjects([]);
-        // }
+        const resp = await GetFile();
+        // setProjects(mockProject)
+        if(resp?.data.status){
+            setProjects(resp.data.result);
+        }else{
+            setProjects([]);
+        }
 
         setLoading(false);
         }
@@ -87,48 +87,48 @@ export default function SideMenu({params}:Props) {
         const fetchErrorReport = async () => {
             const fileId = await params;
             const { fileid } = fileId;
-            setIsLoading(false); //change to true later
+            setIsLoading(true); //change to false to mock later
 
             if (fileid) {
                 setFileId(fileid);
-                setFileDetails([]);
-                setErrorDetection([]);
-                // try {
-                //     const result = await ErrorReport(fileid, false);
-                //     if (result.success) {
-                //         setFileDetails(result.data.fileDetails);
-                //         setErrorDetection(result.data.detectionResults);
+                // setFileDetails([]);
+                // setErrorDetection([]);
+                try {
+                    const result = await ErrorReport(fileid, false);
+                    if (result.success) {
+                        setFileDetails(result.data.fileDetails);
+                        setErrorDetection(result.data.detectionResults);
 
-                //     } else {
-                //         console.error('Error in processing file:', result.message);
-                //     }
-                // } catch (error) {
-                //     console.error('Unexpected error:', error);
-                // } finally {
-                //     setIsLoading(false);
-                // }
+                    } else {
+                        console.error('Error in processing file:', result.message);
+                    }
+                } catch (error) {
+                    console.error('Unexpected error:', error);
+                } finally {
+                    setIsLoading(false);
+                }
             }
         };
 
         fetchErrorReport();
-}, [params, fileId]); //fileId will remove later
+}, [params,fileId]); //add fileId to mock later
 
     useEffect(() => {
-        // const issueDistribution = errorDetection
-        // .filter((issue) => issue.DetectionStatus === 1)
-        // .filter((issue) => issue.HowManyDetected > 0)
-        // .map((issue) => {
-        //     return {
-        //     IssueType: issue.DataInconsistency,
-        //     IssueDetected: issue.HowManyDetected,
-        //     };
-        // });
+        const issueDistribution = errorDetection
+        .filter((issue) => issue.DetectionStatus === 1)
+        .filter((issue) => issue.HowManyDetected > 0)
+        .map((issue) => {
+            return {
+            IssueType: issue.DataInconsistency,
+            IssueDetected: issue.HowManyDetected,
+            };
+        });
 
-        // setIssue(issueDistribution);
-        setIssue(mockIssue);
+        setIssue(issueDistribution);
+        // setIssue(mockIssue);
         
         
-    }, [errorDetection,fileDetails]); //fileDetails will remove later
+    }, [errorDetection,fileDetails]); //add fileDetails will to mock later
     
     return (
         <div

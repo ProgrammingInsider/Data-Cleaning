@@ -14,7 +14,7 @@ const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React
 
     const handlePagination = (increase: boolean) => {
         setRow(prev => {
-            const newValue = increase ? Number(prev) + 1 : Number(prev) - 1;
+            const newValue = increase ? Number(prev) + 50 : Number(prev) - 50;
             return newValue < 0 ? 0 : newValue;
         });
     };
@@ -25,7 +25,7 @@ const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React
                 <span>show:</span>
                 <span className='flex justify-between items-center gap-1'>
                 <FaAngleLeft onClick={()=>handlePagination(false)} className="cursor-pointer" />
-                <input type="number" value={row} onChange={(e)=>setRow(e.target.value)} min={0} className='w-12 bg-transparent border border-gray-400 rounded-md p-1 focus:outline-none' /><FaAngleRight onClick={()=>handlePagination(true)} className="cursor-pointer" />
+                <input type="text" value={row} onChange={(e)=>setRow(e.target.value)} min={0} className='w-14 bg-transparent border border-gray-400 rounded-md p-1 focus:outline-none' /><FaAngleRight onClick={()=>handlePagination(true)} className="cursor-pointer" />
                 </span>
         </div>
 
