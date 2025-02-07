@@ -1,7 +1,6 @@
 "use client"
 
 import CleanDataTableHeader from "@/components/CleanDataTableHeader"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Table,
     TableBody,
@@ -143,43 +142,49 @@ import { useGlobalContext } from "@/context/context"
       },
   ]
   
-  export default function TablePage() {
-    const {expand, setExpand} = useGlobalContext();
+ 
 
-    return (
-    <div className={`w-full overflow-hidden ${expand ? 'fixed background inset-0 z-50 top-0 left-0 right-0 bottom-0 overflow-hidden': 'h-[calc(100vh-100px)]'}`}>
-      <CleanDataTableHeader setExpand={setExpand} expand={expand}/>
-        <ScrollArea className="w-full h-full overflow-y-scroll">
-        <div className="w-full overflow-hidden">
-            <Table className="w-full min-w-[800px]">
+  export default function TablePage() {
+  const { expand, setExpand } = useGlobalContext();
+
+  return (
+    <div className={`w-full h-screen flex flex-col overflow-x-hidden  ${expand ? 'fixed background inset-0 z-50 top-0 left-0 right-0 bottom-0 overflow-hidden': 'h-full'}`}>
+
+      {/* Table Header */}
+      <CleanDataTableHeader setExpand={setExpand} expand={expand} />
+
+      {/* Scrollable Table Container */}
+      <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
+        <div className="min-w-[800px] overflow-x-hidden">
+          <Table className="min-w-full">
             <TableCaption>A list of your recent invoices.</TableCaption>
             <TableHeader>
-                <TableRow>
+              <TableRow>
                 <TableHead className="w-[100px]">Invoice</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Method</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
+              </TableRow>
             </TableHeader>
             <TableBody>
-                {invoices.map((invoice) => (
+              {invoices.map((invoice) => (
                 <TableRow key={invoice.invoice}>
-                    <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                    <TableCell>{invoice.paymentStatus}</TableCell>
-                    <TableCell>{invoice.paymentMethod}</TableCell>
-                    <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+                  <TableCell className="font-medium">{invoice.invoice}</TableCell>
+                  <TableCell>{invoice.paymentStatus}</TableCell>
+                  <TableCell>{invoice.paymentMethod}</TableCell>
+                  <TableCell className="text-right">{invoice.totalAmount}</TableCell>
                 </TableRow>
-                ))}
+              ))}
             </TableBody>
             <TableFooter>
-                <TableRow>
+              <TableRow>
                 <TableCell colSpan={3}>Total</TableCell>
                 <TableCell className="text-right">$2,500.00</TableCell>
-                </TableRow>
+              </TableRow>
             </TableFooter>
-            </Table>
+          </Table>
         </div>
-        </ScrollArea>
+      </div>
     </div>
-    );
+  );
 }

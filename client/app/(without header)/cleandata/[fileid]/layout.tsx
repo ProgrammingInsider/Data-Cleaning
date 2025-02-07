@@ -33,7 +33,8 @@ export default function CleanDataLayout({
 
 
     return (
-        <div className={`w-screen flex border-t border-b border-gray-800 ${expand || 'h-[calc(100vh-70px)]'}`}>
+        // ${expand || 'h-[calc(100vh-70px)]'}
+        <div className={`w-screen flex border-t border-b border-gray-800 h-screen`}>
             {expand ? (
                 <div className="fixed inset-0 z-50">{table}</div>
             ) : (
@@ -47,7 +48,7 @@ export default function CleanDataLayout({
                         {chat}
                     </ResizablePanel>
                     <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={65} className="sticky right-0 overflow-x-auto">
+                    <ResizablePanel defaultSize={65} className="sticky right-0 overflow-x-hidden">
                         {table}
                     </ResizablePanel>
                 </ResizablePanelGroup>

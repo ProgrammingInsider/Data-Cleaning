@@ -70,6 +70,7 @@ body {
   background-color: var(--color-background);
   color: var(--color-paragraph); 
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
@@ -373,7 +374,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Track color */
+  background: transparent; /* Track color */
   border-radius: 4px;
 }
 

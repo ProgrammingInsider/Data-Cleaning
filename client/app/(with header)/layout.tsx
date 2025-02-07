@@ -1,5 +1,6 @@
-import "./globals.css";
+import Header from "@/components/Header";
 import ContextAPI from "@/context/context";
+import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -20,9 +21,12 @@ export default function RootLayout({
       </head>
       <ContextAPI>
         <body>
+          <Header/>
           <main>
           {children}
           </main>
+          <div className="h-2 bg-gradient-to-r from-[#F7E16A] to-[#AE6CE3]"></div>
+          <Footer/>
         </body>
       </ContextAPI>
     </html>

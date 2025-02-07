@@ -7,7 +7,9 @@ import { FaAngleRight } from "react-icons/fa6";
 import { FaAngleLeft } from "react-icons/fa6";
 import { IoMdShare } from "react-icons/io";
 import { BsThreeDots } from "react-icons/bs";
+import { FaRegWindowClose } from "react-icons/fa";
 import { useState } from "react";
+import Link from "next/link";
 
 const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React.Dispatch<React.SetStateAction<boolean>>}) => {
     const [row, setRow] = useState<number | string>(50)
@@ -25,7 +27,7 @@ const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React
                 <span>show:</span>
                 <span className='flex justify-between items-center gap-1'>
                 <FaAngleLeft onClick={()=>handlePagination(false)} className="cursor-pointer" />
-                <input type="text" value={row} onChange={(e)=>setRow(e.target.value)} min={0} className='w-14 bg-transparent border border-gray-400 rounded-md p-1 focus:outline-none' /><FaAngleRight onClick={()=>handlePagination(true)} className="cursor-pointer" />
+                <input type="text" value={row} onChange={(e)=>setRow(e.target.value)} min={0} className='w-14 bg-transparent border text-sm border-gray-400 rounded-md focus:outline-none' /><FaAngleRight onClick={()=>handlePagination(true)} className="cursor-pointer" />
                 </span>
         </div>
 
@@ -37,7 +39,10 @@ const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React
                 ?  <LuShrink onClick={()=>setExpand(false)} className="cursor-pointer" />
                 :   <LuExpand onClick={()=>setExpand(true)} className="cursor-pointer" />
             }
-            <BsThreeDots />
+            <BsThreeDots className="cursor-pointer" />
+            <Link href={"/projects"}>
+                <FaRegWindowClose className="cursor-pointer" />
+            </Link>
         </div>
     </header>
   )
