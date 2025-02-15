@@ -6,10 +6,12 @@ import { FaFileAlt } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import {Props, ErrorDetectionType, fileDetailsType, IssueDistributionType} from '@/utils/types'
+// import {Props, ErrorDetectionType, fileDetailsType, IssueDistributionType} from '@/utils/types'
+import {Props} from '@/utils/types'
 import { ErrorReport, GetFile } from "@/utils/fileActions";
 import { FaBoxTissue } from "react-icons/fa";
 import SmallLoading from "@/components/SmallLoading";
+import { useGlobalContext } from "@/context/context"
 
 interface projectType {
     file_id:string;
@@ -17,21 +19,18 @@ interface projectType {
     description:string;
     category:string;
     progress:number;
-  }
+}
 
 export default function SideMenu({params}:Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [isIssueOpen, setIsIssueOpen] = useState(true);
     const [active, setActive] = useState<number>(-1);
     const [loading, setLoading] = useState(false);
-    const [errorDetection, setErrorDetection] = useState<ErrorDetectionType[]>([]);
-    const [fileDetails, setFileDetails] = useState<fileDetailsType[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [projects, setProjects] = useState<projectType[]>([]);
     const [fileId, setFileId] = useState<string>("");
-    const [issue, setIssue] = useState<IssueDistributionType[]>([]);
+    const { issues,isCleanDataLoading } = useGlobalContext();
 
-
+    const totalErrors = issues.reduce((sum, issue) => sum + issue.errors.length, 0);
 
     useEffect(()=>{
         setLoading(true); //change to false to mock later
@@ -79,26 +78,10 @@ export default function SideMenu({params}:Props) {
 
         fetchErrorReport();
 }, [params,fileId]); //add fileId to mock later
-
-    useEffect(() => {
-        const issueDistribution = errorDetection
-        .filter((issue) => issue.DetectionStatus === 1)
-        .filter((issue) => issue.HowManyDetected > 0)
-        .map((issue) => {
-            return {
-            IssueType: issue.DataInconsistency,
-            IssueDetected: issue.HowManyDetected,
-            };
-        });
-
-        setIssue(issueDistribution);
-        
-        
-    }, [errorDetection,fileDetails]); //add fileDetails will to mock later
     
     return (
         <div
-            className="w-full h-screen py-4"
+            className="w-full h-screen py-4 hover:overflow-y-auto custom-scrollbar"
             style={{
                 color: "hsl(var(--sidebar-foreground))",
             }}
@@ -154,35 +137,43 @@ export default function SideMenu({params}:Props) {
                     onClick={() => setIsIssueOpen(!isIssueOpen)}
                     className="flex items-center justify-between w-full px-3 py-2 rounded-lg transition"
                 >
-                    <span className="text-sm para">Issues</span>
+                    <span className="text-sm para">Issues&nbsp;({totalErrors})</span>
                     {isIssueOpen ? <IoChevronDown /> : <IoChevronForward />}
                 </button>
 
                 {/* File List (Collapsible) */}
                 {isIssueOpen && (
-                    <ul className="mt-2 space-y-2">
-                        {
-                            isLoading ? 
-                            <div className="flex justify-center py-2"><SmallLoading/></div> : 
-                            issue.map((eachIssue, index) => (
-                                <li
-                                    key={index}
-                                    className="flex items-center justify-between px-4 py-2 rounded-lg shadow-sm cursor-pointer transition relative hover:secondaryBg"
-                                    style={{
-                                        color: "hsl(var(--sidebar-primary-foreground))",
-                                    }}
-                                >
-                                    <Link href={"#"}>
-                                        <span className="flex items-center text-sm gap-2 truncate">
-                                            <FaBoxTissue />
-                                            {eachIssue.IssueType}
-                                        </span>
-                                    </Link>
-                                    <div className="absolute top-0 right-0 bottom-0 text-base py-1 px-2 z-10 sectionBg">{eachIssue.IssueDetected
-                                    }</div>
-                                </li>
-                            ))
-                        }
+                    <ul className="mt-2 space-y-2 overflow-y-auto">
+                        {isCleanDataLoading ? (
+                            <div className="flex justify-center py-2"><SmallLoading /></div>
+                        ) : (
+
+                            (issues.length > 0)
+                            ? (
+                                issues.map((eachIssue, index) => (
+                                    <li
+                                        key={index}
+                                        className="px-4 py-2 rounded-lg shadow-sm cursor-pointer transition relative hover:secondaryBg"
+                                        style={{ color: "hsl(var(--sidebar-primary-foreground))" }}
+                                    >
+                                        <Link href={`#row-${eachIssue.row}`}>
+                                            <span className="flex items-center text-sm gap-2 truncate font-bold">
+                                                <FaBoxTissue />
+                                                Row {eachIssue.row}:
+                                            </span>
+                                        </Link>
+                                        <ul className="pl-6 mt-1 text-sm list-disc">
+                                            {eachIssue.errors.map((error, errorIndex) => (
+                                                <li key={errorIndex}>{error}</li>
+                                            ))}
+                                        </ul>
+                                    </li>
+                                ))
+                            )
+                            :
+                            <div className={`p-2 rounded-lg text-wrap text-sm max-w-[80%]mr-auto bg-secondary text-secondary-foreground"
+                                `}>No Issues Found</div>
+                        )}
                     </ul>
                 )}
             </div>

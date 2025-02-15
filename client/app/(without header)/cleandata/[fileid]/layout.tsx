@@ -1,5 +1,6 @@
 "use client"
 
+// import CleanDataMainHeader from "@/components/CleanDataMainHeader";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -32,27 +33,27 @@ export default function CleanDataLayout({
     }, [expand]);
 
 
-    return (
         // ${expand || 'h-[calc(100vh-70px)]'}
-        <div className={`w-screen flex border-t border-b border-gray-800 h-screen`}>
+    return <>
+        <div className={`w-screen border-t border-b border-gray-800 overflow-hidden h-screen`}>
             {expand ? (
                 <div className="fixed inset-0 z-50">{table}</div>
-            ) : (
-                // Normal layout when not expanded
+            ) : <>
+            {/* <CleanDataMainHeader/> */}
                 <ResizablePanelGroup direction="horizontal" className="w-full h-full">
-                    <ResizablePanel defaultSize={15} className="border-r border-gray-800">
-                        {sidemenu}
-                    </ResizablePanel>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={20} className="border-r border-gray-800">
-                        {chat}
-                    </ResizablePanel>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={65} className="sticky right-0 overflow-x-hidden">
-                        {table}
-                    </ResizablePanel>
+                        <ResizablePanel defaultSize={15} className="border-r border-gray-800 overflow-y-auto">
+                            {sidemenu}
+                        </ResizablePanel>
+                        <ResizableHandle withHandle />
+                        <ResizablePanel defaultSize={20} className="border-r border-gray-800">
+                            {chat}
+                        </ResizablePanel>
+                        <ResizableHandle withHandle />
+                        <ResizablePanel defaultSize={65} className="sticky right-0 overflow-x-hidden">
+                            {table}
+                        </ResizablePanel>
                 </ResizablePanelGroup>
-            )}
+                </>}
         </div>
-    );
+    </>;
 }

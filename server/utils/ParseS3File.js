@@ -54,6 +54,29 @@ export const ParseS3File = async ({ fileKey }) => {
   }
 };
 
+// Helper function to convert numeric strings to numbers and replace empty strings with null
+const convertNumbers = (obj) => {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => {
+      if (typeof value === "string") {
+        const trimmedValue = value.trim();
+        
+        // Replace empty string with null
+        if (trimmedValue === "") {
+          return [key, null];
+        }
+        
+        // Convert numeric strings to numbers
+        if (trimmedValue.match(/^-?\d+(\.\d+)?$/)) {
+          return [key, Number(trimmedValue)];
+        }
+      }
+      return [key, value];
+    })
+  );
+};
+
+
 // Helper function to parse CSV
 const parseCSV = (fileBuffer) => {
   return new Promise((resolve, reject) => {
@@ -61,11 +84,12 @@ const parseCSV = (fileBuffer) => {
     const stream = Readable.from(fileBuffer.toString("utf-8"));
     stream
       .pipe(csv())
-      .on("data", (data) => results.push(data))
+      .on("data", (data) => results.push(convertNumbers(data)))
       .on("end", () => resolve(results))
       .on("error", (err) => reject(err));
   });
 };
+
 
 // Helper function to parse Excel
 const parseExcel = (fileBuffer) => {
@@ -75,7 +99,13 @@ const parseExcel = (fileBuffer) => {
   const sheetNames = workbook.SheetNames;
   return sheetNames.reduce((sheets, sheetName) => {
 
-    sheets[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    // Convert numeric strings to numbers
+    sheetData = sheetData.map(convertNumbers);
+
+    sheets[sheetName] = sheetData;
+
     return sheets;
   }, {});
 

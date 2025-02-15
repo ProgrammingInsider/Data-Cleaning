@@ -7,6 +7,7 @@ const errorHandler = (err, req, res, next) => {
       .status(err.statusCode)
       .json({ status: false, message: err.message });
   }
+console.log(err);
 
   let customError = {
     // set default

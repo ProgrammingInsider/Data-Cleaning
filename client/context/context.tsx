@@ -1,5 +1,6 @@
 'use client'
 
+import { CleanData } from "@/utils/cleanDataActions";
 import { createContext, useState, useContext, useEffect } from "react";
 
 interface Payload {
@@ -8,11 +9,47 @@ interface Payload {
     lastName: string;
 }
 
+interface Action<T = unknown> { 
+    action_id: string;
+    file_id: string;
+    user_id: string;
+    action_type: string;
+    chat: string;
+    action_details: T; 
+    created_at: string;
+}
+
+interface Issue {
+    row: number;
+    errors: string[];
+}
+
+interface RecordType {
+    [key: string]: string | number | boolean | null; 
+}
+
+interface Schema {
+    [key: string]: string; // Adjust based on actual schema structure
+}
+
+
 interface UserContextType {
     user: Payload | null;
     setUser: React.Dispatch<React.SetStateAction<Payload | null>>;
     expand: boolean;
     setExpand:React.Dispatch<React.SetStateAction<boolean>>;
+    setRefreshWorkstation:React.Dispatch<React.SetStateAction<boolean>>;
+    chat: string;
+    cleanDataFileId: string;
+    setChat:React.Dispatch<React.SetStateAction<string>>;
+    setCleanDataFileId:React.Dispatch<React.SetStateAction<string>>;
+    records: RecordType[];
+    issues: Issue[];
+    actions: Action[];
+    schema: Schema;
+    insertMessage: (message: string) => void;
+    isCleanDataLoading:boolean;
+    refreshWorkstation:boolean;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -20,6 +57,15 @@ const UserContext = createContext<UserContextType | null>(null);
 const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
     const [user, setUser] = useState<Payload | null>(null);
     const [expand, setExpand] = useState<boolean>(false);
+    const [schema, setSchema] = useState({});
+    const [records, setRecords] = useState<RecordType[]>([]);
+    const [issues, setIssues] = useState<Issue[]>([]);
+    const [actions, setActions] = useState<Action[]>([]);
+    const [chat, setChat] = useState<string>("");
+    const [cleanDataFileId, setCleanDataFileId] = useState<string>("");
+    const [isCleanDataLoading, setIsCleanDataLoading] = useState<boolean>(true);
+    const [refreshWorkstation, setRefreshWorkstation] = useState<boolean>(true);
+
 
 
     useEffect(() => {
@@ -44,8 +90,42 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
 
     }, [user]);
 
+    useEffect(()=>{
+        const fetchCleanDataResponse = async() => {
+            setIsCleanDataLoading(true);
+
+            const response = await CleanData(cleanDataFileId,chat);
+        
+            if(Object.keys(response).length > 0){
+                const {success, data} = response;
+                if(success){
+                    const {actions, issues, records, schema} = data;
+                    setActions(actions);
+                    setIssues(issues);
+                    setRecords(records);
+                    setSchema(schema);
+                    setChat("");
+                }else{
+
+                }
+            }
+
+            setIsCleanDataLoading(false);
+            
+        }
+
+        fetchCleanDataResponse();
+    },[chat,cleanDataFileId, refreshWorkstation]);
+
+    const insertMessage = (message:string) => {
+        console.log(message);       
+        setChat(message)
+    }
+
+
+
     return (
-        <UserContext.Provider value={{user, setUser, expand, setExpand}}>
+        <UserContext.Provider value={{user, setUser, expand, setExpand, chat, setChat, schema, actions, records, issues, insertMessage, setCleanDataFileId, cleanDataFileId, isCleanDataLoading,setRefreshWorkstation, refreshWorkstation}}>
             {children}
         </UserContext.Provider>
     )
