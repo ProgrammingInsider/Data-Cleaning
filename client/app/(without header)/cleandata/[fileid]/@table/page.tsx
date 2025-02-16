@@ -44,12 +44,12 @@ export default function TablePage({params}:Props) {
       <div className="flex-1 h-full overflow-y-auto overflow-x-auto custom-scrollbar relative">
 
         {isCleanDataLoading && (
-          <div className={`absolute top-0 right-0 bottom-0 left-0 inset-0 z-20 flex items-center justify-center bg-transparent backdrop-blur-sm min-w-[${tableWidth}] h-full`}>
+          <div className={`absolute top-0 right-0 bottom-0 left-0 inset-0 z-20 flex items-center justify-center bg-transparent backdrop-blur-sm min-w-[${tableWidth}]`}>
             <Loading />
           </div>
         )}
-{/* min-w-[30000px]  */}
-          <div className={`min-w-[${tableWidth}] ${isCleanDataLoading ? "opacity-100" : ""}`}>
+
+          <div className={`min-w-[${tableWidth}]  ${isCleanDataLoading ? "opacity-100" : ""}`}>
           {records.length > 0 ? (
           <Table className="min-w-full relative">
             <TableHeader>

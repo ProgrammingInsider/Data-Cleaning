@@ -6,9 +6,7 @@ import { FaFileAlt } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-// import {Props, ErrorDetectionType, fileDetailsType, IssueDistributionType} from '@/utils/types'
-import {Props} from '@/utils/types'
-import { ErrorReport, GetFile } from "@/utils/fileActions";
+import { GetFile } from "@/utils/fileActions";
 import { FaBoxTissue } from "react-icons/fa";
 import SmallLoading from "@/components/SmallLoading";
 import { useGlobalContext } from "@/context/context"
@@ -21,13 +19,12 @@ interface projectType {
     progress:number;
 }
 
-export default function SideMenu({params}:Props) {
+export default function SideMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const [isIssueOpen, setIsIssueOpen] = useState(true);
     const [active, setActive] = useState<number>(-1);
     const [loading, setLoading] = useState(false);
     const [projects, setProjects] = useState<projectType[]>([]);
-    const [fileId, setFileId] = useState<string>("");
     const { issues,isCleanDataLoading } = useGlobalContext();
 
     const totalErrors = issues.reduce((sum, issue) => sum + issue.errors.length, 0);
@@ -49,35 +46,6 @@ export default function SideMenu({params}:Props) {
 
         fetchProject()
     },[]) 
-
-
-    useEffect(() => {
-        const fetchErrorReport = async () => {
-            const fileId = await params;
-            const { fileid } = fileId;
-            setIsLoading(true); //change to false to mock later
-
-            if (fileid) {
-                setFileId(fileid);
-                try {
-                    const result = await ErrorReport(fileid, false);
-                    if (result.success) {
-                        setFileDetails(result.data.fileDetails);
-                        setErrorDetection(result.data.detectionResults);
-
-                    } else {
-                        console.error('Error in processing file:', result.message);
-                    }
-                } catch (error) {
-                    console.error('Unexpected error:', error);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        fetchErrorReport();
-}, [params,fileId]); //add fileId to mock later
     
     return (
         <div
@@ -99,7 +67,7 @@ export default function SideMenu({params}:Props) {
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex items-center justify-between w-full px-3 py-2 rounded-lg transition"
                 >
-                    <span className="text-sm para">Datasets</span>
+                    <span className="text-sm para">Datasets&nbsp;({projects.length})</span>
                     {isOpen ? <IoChevronDown /> : <IoChevronForward />}
                 </button>
 
