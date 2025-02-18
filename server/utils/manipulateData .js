@@ -77,7 +77,7 @@ export const manipulateData = (parsedData, actions, issues) => {
                 modifiedData = modifiedData.filter(record => record[action.column] !== action.value);
                 break;
             
-                case "DELETE_ROWS_WHERE_VALUE_LESS_THAN":
+            case "DELETE_ROWS_WHERE_VALUE_LESS_THAN":
                 modifiedData = modifiedData.filter(record => Number(record[action.column]) >= action.value);
                 break;
 

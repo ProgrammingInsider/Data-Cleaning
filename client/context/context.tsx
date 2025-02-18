@@ -2,21 +2,12 @@
 
 import { CleanData } from "@/utils/cleanDataActions";
 import { createContext, useState, useContext, useEffect } from "react";
+import {Action} from "../utils/types"
 
 interface Payload {
     email: string;
     firstName: string;
     lastName: string;
-}
-
-interface Action<T = unknown> { 
-    action_id: string;
-    file_id: string;
-    user_id: string;
-    action_type: string;
-    chat: string;
-    action_details: T; 
-    created_at: string;
 }
 
 interface Issue {
@@ -50,6 +41,8 @@ interface UserContextType {
     insertMessage: (message: string) => void;
     isCleanDataLoading:boolean;
     refreshWorkstation:boolean;
+    selectedRow:number;
+    setSelectedRow:React.Dispatch<React.SetStateAction<number>>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -65,8 +58,11 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
     const [cleanDataFileId, setCleanDataFileId] = useState<string>("");
     const [isCleanDataLoading, setIsCleanDataLoading] = useState<boolean>(true);
     const [refreshWorkstation, setRefreshWorkstation] = useState<boolean>(true);
+    const [selectedRow, setSelectedRow] = useState<number>(0);
 
 
+    console.log(selectedRow);
+    
 
     useEffect(() => {
         const getUserFromCookies = () => {
@@ -105,6 +101,7 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
                     setRecords(records);
                     setSchema(schema);
                     setChat("");
+                    setSelectedRow(0);
                 }else{
 
                 }
@@ -125,7 +122,7 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
 
 
     return (
-        <UserContext.Provider value={{user, setUser, expand, setExpand, chat, setChat, schema, actions, records, issues, insertMessage, setCleanDataFileId, cleanDataFileId, isCleanDataLoading,setRefreshWorkstation, refreshWorkstation}}>
+        <UserContext.Provider value={{user, setUser, expand, setExpand, chat, setChat, schema, actions, records, issues, insertMessage, setCleanDataFileId, cleanDataFileId, isCleanDataLoading,setRefreshWorkstation, refreshWorkstation, selectedRow, setSelectedRow}}>
             {children}
         </UserContext.Provider>
     )

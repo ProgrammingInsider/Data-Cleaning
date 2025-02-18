@@ -95,3 +95,26 @@ export const DeleteAction = async (fileId:string,actionId:string) => {
     }
     }
 }
+
+
+export const DeleteAllAction = async (fileId:string) => {
+    const cookieStore = await cookies();
+    const accessTokenCookie = cookieStore.get("accessToken")?.value;
+    
+    try{
+
+        const {data} = await axiosPrivate.delete(`/deleteallaction?fileId=${fileId}`,{
+            headers: {
+                Authorization: `Bearer ${accessTokenCookie}`, 
+            },
+        });
+        
+        return {data};
+    }catch(error){
+
+    if(error){
+        console.log(error);
+        
+    }
+    }
+}

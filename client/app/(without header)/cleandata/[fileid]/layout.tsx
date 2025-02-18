@@ -1,6 +1,6 @@
 "use client"
 
-// import CleanDataMainHeader from "@/components/CleanDataMainHeader";
+import CleanDataMainHeader from "@/components/CleanDataMainHeader";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -34,13 +34,15 @@ export default function CleanDataLayout({
 
 
         // ${expand || 'h-[calc(100vh-70px)]'}
+        // className={`w-screen border-t border-b border-gray-800 overflow-hidden h-[calc(100vh-40px)]`} 
     return <>
-        <div className={`w-screen border-t border-b border-gray-800 overflow-hidden h-screen`}>
+        <div className="w-screen border-t border-b border-gray-800 flex flex-col overflow-hidden h-screen">
             {expand ? (
                 <div className="fixed inset-0 z-50">{table}</div>
             ) : <>
-            {/* <CleanDataMainHeader/> */}
-                <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+                <CleanDataMainHeader/>
+                <div className="h-[calc(100vh-40px)]">
+                    <ResizablePanelGroup direction="horizontal" className="w-full h-full">
                         <ResizablePanel defaultSize={15} className="border-r border-gray-800 overflow-y-auto">
                             {sidemenu}
                         </ResizablePanel>
@@ -49,10 +51,14 @@ export default function CleanDataLayout({
                             {chat}
                         </ResizablePanel>
                         <ResizableHandle withHandle />
-                        <ResizablePanel defaultSize={65} className="sticky right-0 overflow-x-hidden">
-                            {table}
+                        {/* className="sticky right-0 h-full w-full" */}
+                        <ResizablePanel defaultSize={65}>
+                            <div className="flex flex-1 h-full w-full">
+                                {table}
+                            </div>
                         </ResizablePanel>
-                </ResizablePanelGroup>
+                    </ResizablePanelGroup>
+                </div>
                 </>}
         </div>
     </>;

@@ -1,34 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Paperclip, ArrowUp } from "lucide-react";
 import { useGlobalContext } from "@/context/context";
 import Loading from "./loading";
-import { IoClose } from "react-icons/io5";
-import { DeleteAction } from "@/utils/cleanDataActions";
+
 
 export default function Chat() {
     // const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);
     const [input, setInput] = useState("");
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const {insertMessage, actions, chat, isCleanDataLoading, cleanDataFileId, setRefreshWorkstation, refreshWorkstation} = useGlobalContext();
+    const {insertMessage, isCleanDataLoading,} = useGlobalContext();
 
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-    const handleUndo = async(actionId:string) => {
-        const response = await DeleteAction(cleanDataFileId,actionId);
-
-        if(response){
-            const {data} = response;
-
-            if(data.status){
-                setRefreshWorkstation(!refreshWorkstation)
-            }
-        }
-    }
+    // const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     const sendMessage = () => {
         if (!input.trim()) return;
@@ -44,13 +31,13 @@ export default function Chat() {
         }
     };
     // Auto-scroll to bottom when messages change
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [chat]);
+    // useEffect(() => {
+    //     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // }, [chat]);
 
     return (
         <Card className="w-full h-full flex border-none flex-col relative">
-            <CardHeader className="text-lg font-semibold border-b border-gray-800 p-1">Actions&nbsp;({actions.length})</CardHeader>
+            <CardHeader className="text-lg font-semibold border-b border-gray-800 p-1">Chat</CardHeader>
 
             <CardContent className="h-full overflow-hidden border-none mt-4 relative">
                         {isCleanDataLoading && (
@@ -59,32 +46,9 @@ export default function Chat() {
                             </div>
                             )}
                 <ScrollArea className="w-full h-full">
-                    <div className="space-y-3">
-                        {/* <div className="flex justify-center py-2"><SmallLoading /></div> */}
-                        {
-                            (actions?.length > 0)
-                            ?actions.map((action, index) => (
-                                <div className="flex gap-1"  key={index}>
-                                    <div className="mr-auto bg-secondary text-secondary-foreground w-6 h-6 rounded-full flex justify-center items-center text-xl cursor-pointer" onClick={()=>handleUndo(action.action_id)}><IoClose/></div>
-                                    <div
-                                        className={`p-2 rounded-lg text-wrap text-sm max-w-[80%] ${
-                                            action.chat !== null 
-                                                ? "ml-auto bg-primary text-primary-foreground"
-                                                : "mr-auto bg-secondary text-secondary-foreground"
-                                        }`}
-                                    >
-                                        {action.chat}
-                                    </div>
-                                </div>
-                            ))
-                            : <div className={`p-2 rounded-lg text-wrap text-sm max-w-[80%]mr-auto bg-secondary text-secondary-foreground"
-                            }`}
-                            >
-                                {isCleanDataLoading || "No Action taken"}
-                            </div>
-                        }
+                    <div className="space-y-2">
                         {/* Invisible div to scroll to */}
-                        <div ref={messagesEndRef} />
+                        {/* <div ref={messagesEndRef} /> */}
                     </div>
                 </ScrollArea>
             </CardContent>

@@ -63,6 +63,9 @@
   --font-ui: "Inter", "Helvetica Neue", "Arial", sans-serif;
 } */
 
+html{
+  scroll-behavior: smooth;
+}
 
 body {
   font-size: 16px; 
@@ -384,6 +387,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #005f67; /* Scrollbar color on hover */
+}
+
+@keyframes blink {
+  0%, 100% { background-color: rgb(96, 165, 250); } /* Light Blue */
+  50% { background-color: transparent; }
+}
+
+.animate-blink {
+  animation: blink 1s linear 3; /* Blinks 3 times */
 }
 
 

@@ -40,6 +40,16 @@ export interface fileDetailsType {
   description: string;
 }
 
+export interface Action<T = unknown> { 
+  action_id: string;
+  file_id: string;
+  user_id: string;
+  action_type: string;
+  chat: string;
+  action_details: T; 
+  created_at: string;
+}
+
 
 
 

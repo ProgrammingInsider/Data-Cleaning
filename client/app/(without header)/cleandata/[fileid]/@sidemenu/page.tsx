@@ -25,9 +25,13 @@ export default function SideMenu() {
     const [active, setActive] = useState<number>(-1);
     const [loading, setLoading] = useState(false);
     const [projects, setProjects] = useState<projectType[]>([]);
-    const { issues,isCleanDataLoading } = useGlobalContext();
+    const { issues,isCleanDataLoading,setSelectedRow } = useGlobalContext();
 
     const totalErrors = issues.reduce((sum, issue) => sum + issue.errors.length, 0);
+
+    const handleSelectedRow = (index:number) => {
+        setSelectedRow(index);
+    }    
 
     useEffect(()=>{
         setLoading(true); //change to false to mock later
@@ -111,7 +115,7 @@ export default function SideMenu() {
 
                 {/* File List (Collapsible) */}
                 {isIssueOpen && (
-                    <ul className="mt-2 space-y-2 overflow-y-auto">
+                    <ul className="mt-2 space-y-2 overflow-y-auto overflow-x-hidden">
                         {isCleanDataLoading ? (
                             <div className="flex justify-center py-2"><SmallLoading /></div>
                         ) : (
@@ -123,14 +127,18 @@ export default function SideMenu() {
                                         key={index}
                                         className="px-4 py-2 rounded-lg shadow-sm cursor-pointer transition relative hover:secondaryBg"
                                         style={{ color: "hsl(var(--sidebar-primary-foreground))" }}
+                                        onClick={() => {
+                                            console.log("Clicked row:", eachIssue.row);
+                                            handleSelectedRow(eachIssue.row);
+                                        }}
                                     >
-                                        <Link href={`#row-${eachIssue.row}`}>
+                                        <div>
                                             <span className="flex items-center text-sm gap-2 truncate font-bold">
                                                 <FaBoxTissue />
                                                 Row {eachIssue.row}:
                                             </span>
-                                        </Link>
-                                        <ul className="pl-6 mt-1 text-sm list-disc">
+                                        </div>
+                                        <ul className="pl-6 mt-1 text-sm text-nowrap">
                                             {eachIssue.errors.map((error, errorIndex) => (
                                                 <li key={errorIndex}>{error}</li>
                                             ))}
