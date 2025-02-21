@@ -9,11 +9,12 @@ interface ErrorResponse {
 
 export const CleanData = async(fileId: string, chat:string | null) => {
 
+
         const cookieStore = await cookies();
         const accessTokenCookie = cookieStore.get("accessToken")?.value;
         
         try {
-            const { data } = await axiosPrivate.post(
+            const { status, data } = await axiosPrivate.post(
                 "/cleandata",
                 { fileId, chat },
                 {
@@ -23,11 +24,13 @@ export const CleanData = async(fileId: string, chat:string | null) => {
                 }
             );
     
+        
             if (data.status === true) {
                 return { success: true, data };
             } else {
                 console.error("Error detected in response:", data.message);
-                return { success: false, message: data.message || "Unknown error occurred" };
+                
+                return { success: false, status, message: data.message || "Unknown error occurred" };
             }
         } catch (error: unknown) {
             if (error instanceof AxiosError) {

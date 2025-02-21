@@ -369,6 +369,23 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes dot-flash {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.dot-flash::after {
+  content: " .";
+  animation: dot-flash 1s infinite steps(1) alternate;
+}
+
+.dot-flash::before {
+  content: " ";
+  animation: dot-flash 1s infinite steps(1) alternate 0.3s;
+}
+
+
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;  /* Scrollbar width */
@@ -396,6 +413,18 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-blink {
   animation: blink 1s linear 3; /* Blinks 3 times */
+}
+
+.custom-wrap {
+  overflow-wrap: anywhere;
+}
+
+/* Position the arrow properly */
+.before\:rotate-45::before {
+  transform: rotate(45deg);
+  top: -4px; /* Adjust depending on tooltip position */
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
 }
 
 

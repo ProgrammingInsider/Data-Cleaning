@@ -44,14 +44,32 @@ export interface Action<T = unknown> {
   action_id: string;
   file_id: string;
   user_id: string;
+  title: string;
+  response: string;
   action_type: string;
   chat: string;
   action_details: T; 
   created_at: string;
 }
 
+export interface RecordType {
+  [key: string]: string | number | boolean | null; 
+}
 
+export interface Issue {
+  row: number;
+  errors: string[];
+}
 
+export interface Payload {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Schema {
+  [key: string]: string; 
+}
 
 // // types.ts
 

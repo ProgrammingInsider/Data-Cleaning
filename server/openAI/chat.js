@@ -24,6 +24,15 @@ export const messages = async (userInput, schema, issues) => {
   - REMOVE_EMPTY_ROWS: { type: "REMOVE_EMPTY_ROWS" }
   - REMOVE_ROWS_WITH_NULLS: { type: "REMOVE_ROWS_WITH_NULLS" }
 
+  Your task is to generate an array of structured actions based on the provided schema. 
+
+  Each action should contain:
+  - type: The action type (e.g., "DELETE_COLUMN", "FILL_MISSING").
+  - column: The affected column name (if applicable).
+  - title: A short summary of the action performed.
+  - response: A concise response for the user.
+
+
       **Important Note:** 
     1. **If the user requests sorting (e.g., "order rows descending by age"), only return "SORT_ROWS_ASCENDING" or "SORT_ROWS_DESCENDING" actions.**
     2. Do NOT include "REMOVE_ROWS_WITH_ISSUES" unless the user explicitly asks for "cleaning," "removing errors," or "filtering invalid rows." If the request only involves filling missing values (e.g., "change null age to 25"), return only "FILL_MISSING".
@@ -70,7 +79,7 @@ export const response_format = {
           type: "array",
           items: {
             type: "object",
-            required: ["type"],
+            required: ["type", "title", "response"],
             properties: {
               type: { 
                 type: "string", 
@@ -106,7 +115,9 @@ export const response_format = {
               value: { type: ["string", "number"], nullable: true },
               minValue: { type: "number", nullable: true },
               maxValue: { type: "number", nullable: true },
-              count: { type: "number", nullable: true }
+              count: { type: "number", nullable: true },
+              title: { type: "string" },
+              response: { type: "string" } 
             }
           }
         }

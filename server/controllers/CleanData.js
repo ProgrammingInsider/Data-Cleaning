@@ -12,6 +12,7 @@ import {
     temperature, 
     top_p } from "../openAI/chat.js";
 import openai from "../config/openaiConfig.js";
+import BadRequestError from "../errors/bad-request.js";
 
 export const CleanData = async (req, res) => {
     const { userId } = req.user;
@@ -129,7 +130,7 @@ export const CleanData = async (req, res) => {
         aiResponse = parsedResponse?.actions;
         console.log("Before AI actions inserted successfully. ",aiResponse);
 
-        if ((aiResponse && aiResponse.length > 0)) {
+        if ((aiResponse && aiResponse.length > 0 && aiResponse[0].title && aiResponse[0].title !== "")) {
 
             for (const action of aiResponse) {
                 const existingAction = await queryDb(
@@ -139,13 +140,19 @@ export const CleanData = async (req, res) => {
         
                 if (existingAction.length === 0) {
                     await queryDb(
-                        `INSERT INTO actions (file_id, user_id, chat, action_type, action_details) VALUES (?, ?, ?, ?, ?)`,
-                        [fileId, userId, chat, action.type, JSON.stringify(action)]
+                        `INSERT INTO actions (file_id, user_id, title, response, chat, action_type, action_details) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                        [fileId, userId, action.title, action.response, chat, action.type, JSON.stringify(action)]
                     );
                 }
             }
         
             console.log("AI actions inserted successfully. ",aiResponse);
+        }else{
+
+            return res.status(200).json({ 
+                status: false, 
+                message: "The AI could not generate a meaningful response. Please try rephrasing or providing more details for better understanding.",
+            });
         }
         
         
@@ -276,7 +283,7 @@ export const FetchActions = async(req, res) => {
 
     // Fetch actions from the database
     const fileActions = await queryDb(
-        `SELECT * FROM actions WHERE file_id = ? AND user_id = ? ORDER BY created_at ASC`,
+        `SELECT * FROM actions WHERE file_id = ? AND user_id = ? ORDER BY created_at DESC`,
         [fileId,userId]
     );
 
@@ -301,19 +308,15 @@ export const DeleteActions = async(req, res) => {
     const { fileId, actionId } = req.query;
 
     // Fetch actions from the database
-    const fileactions = await queryDb(
-       `SELECT chat FROM actions WHERE file_id = ? AND user_id = ? AND action_id = ?`,
+   if(!fileId || !actionId || !userId){
+        await BadRequestError("File ID, Action ID and User ID are required");
+   }
+
+    await queryDb(
+        `DELETE FROM actions WHERE file_id = ? AND user_id = ? AND action_id = ?`,
         [fileId,userId,actionId]
     );
     
-    if(fileactions.length > 0){
-
-        // Fetch actions from the database
-        await queryDb(
-            `DELETE FROM actions WHERE file_id = ? AND user_id = ? AND chat = ?`,
-            [fileId,userId,fileactions[0].chat]
-        );
-    }
 
     return res.status(200).json({ 
         status: true, 

@@ -2,26 +2,7 @@
 
 import { CleanData } from "@/utils/cleanDataActions";
 import { createContext, useState, useContext, useEffect } from "react";
-import {Action} from "../utils/types"
-
-interface Payload {
-    email: string;
-    firstName: string;
-    lastName: string;
-}
-
-interface Issue {
-    row: number;
-    errors: string[];
-}
-
-interface RecordType {
-    [key: string]: string | number | boolean | null; 
-}
-
-interface Schema {
-    [key: string]: string; // Adjust based on actual schema structure
-}
+import {Action, RecordType, Issue, Payload, Schema} from "../utils/types"
 
 
 interface UserContextType {
@@ -30,9 +11,11 @@ interface UserContextType {
     expand: boolean;
     setExpand:React.Dispatch<React.SetStateAction<boolean>>;
     setRefreshWorkstation:React.Dispatch<React.SetStateAction<boolean>>;
-    chat: string;
     cleanDataFileId: string;
+    chat: string;
     setChat:React.Dispatch<React.SetStateAction<string>>;
+    responseWarning: string;
+    setResponseWarning:React.Dispatch<React.SetStateAction<string>>;
     setCleanDataFileId:React.Dispatch<React.SetStateAction<string>>;
     records: RecordType[];
     issues: Issue[];
@@ -55,14 +38,11 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
     const [issues, setIssues] = useState<Issue[]>([]);
     const [actions, setActions] = useState<Action[]>([]);
     const [chat, setChat] = useState<string>("");
+    const [responseWarning, setResponseWarning] = useState<string>("");
     const [cleanDataFileId, setCleanDataFileId] = useState<string>("");
     const [isCleanDataLoading, setIsCleanDataLoading] = useState<boolean>(true);
     const [refreshWorkstation, setRefreshWorkstation] = useState<boolean>(true);
     const [selectedRow, setSelectedRow] = useState<number>(0);
-
-
-    console.log(selectedRow);
-    
 
     useEffect(() => {
         const getUserFromCookies = () => {
@@ -72,7 +52,7 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
 
                 if (payloadCookie) {
                     const payloadValue = payloadCookie.split("=")[1];
-                    const parsedPayload: Payload = JSON.parse(decodeURIComponent(payloadValue)); // ✅ Parse JSON
+                    const parsedPayload: Payload = JSON.parse(decodeURIComponent(payloadValue)); 
                     setUser(parsedPayload);
                 }
             } catch (error) {
@@ -90,10 +70,12 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
         const fetchCleanDataResponse = async() => {
             setIsCleanDataLoading(true);
 
+            
             const response = await CleanData(cleanDataFileId,chat);
-        
+            
             if(Object.keys(response).length > 0){
                 const {success, data} = response;
+                
                 if(success){
                     const {actions, issues, records, schema} = data;
                     setActions(actions);
@@ -101,9 +83,14 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
                     setRecords(records);
                     setSchema(schema);
                     setChat("");
+                    setResponseWarning("");
                     setSelectedRow(0);
+                }else if(!success && response.status === 200){
+                    const {message} = response;
+                    setResponseWarning(message);
                 }else{
-
+                    console.log(response.message);
+                    
                 }
             }
 
@@ -114,15 +101,14 @@ const ContextAPI: React.FC<{children:React.ReactNode}> = ({children}) => {
         fetchCleanDataResponse();
     },[chat,cleanDataFileId, refreshWorkstation]);
 
-    const insertMessage = (message:string) => {
-        console.log(message);       
+    const insertMessage = (message:string) => {   
         setChat(message)
     }
 
 
 
     return (
-        <UserContext.Provider value={{user, setUser, expand, setExpand, chat, setChat, schema, actions, records, issues, insertMessage, setCleanDataFileId, cleanDataFileId, isCleanDataLoading,setRefreshWorkstation, refreshWorkstation, selectedRow, setSelectedRow}}>
+        <UserContext.Provider value={{user, setUser, expand, setExpand, chat, setChat, schema, actions, records, issues, insertMessage, setCleanDataFileId, cleanDataFileId, isCleanDataLoading,setRefreshWorkstation, refreshWorkstation, selectedRow, setSelectedRow,responseWarning,setResponseWarning}}>
             {children}
         </UserContext.Provider>
     )

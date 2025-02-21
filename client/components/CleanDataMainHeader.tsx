@@ -4,11 +4,20 @@ import { useGlobalContext } from "@/context/context"
 import { DeleteAction, DeleteAllAction } from "@/utils/cleanDataActions";
 import { IoClose } from "react-icons/io5";
 import {Action} from "../utils/types"
+import { useEffect, useState } from "react";
+import SmallLoading from "./SmallLoading";
 
 const CleanDataMainHeader = () => {
+    const[currentAction, setCurrentAction] = useState<number>(-1);
+    const[loading, setLoading] = useState<boolean>(false);
     const {actions, isCleanDataLoading, refreshWorkstation, setRefreshWorkstation, cleanDataFileId} = useGlobalContext();
 
+    const sortedActions = [...(actions as Action[])].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
     const handleUndo = async(actionId:string) => {
+        setLoading(true);
         const response = await DeleteAction(cleanDataFileId,actionId);
 
         if(response){
@@ -18,7 +27,13 @@ const CleanDataMainHeader = () => {
                 setRefreshWorkstation(!refreshWorkstation)
             }
         }
+        
     }
+
+    useEffect(()=>{
+        setCurrentAction(-1);
+        setLoading(false);
+    },[actions])
 
     const handleAllUndo = async() => {
         
@@ -32,23 +47,15 @@ const CleanDataMainHeader = () => {
             }
         }
     }
-
-    // Filter unique chats
-    const uniqueChats = actions?.reduce<Action[]>((acc, action) => {
-        if (!acc.some(item => item.chat === action.chat)) {
-            acc.push(action);
-        }
-        return acc;
-    }, []);
     
   return (
     <header className='flex justify-between items-center sectionBg p-1 px-5 w-full h-10 border-b border-gray-300'>
         <button className="p-2 rounded-lg max-w-[80%] bg-secondary text-secondary-foreground text-nowrap text-sm text-bold mr-5 hover:underline" onClick={handleAllUndo}>
-            Undo All&nbsp;({uniqueChats.length})
+            Undo All&nbsp;({actions.length})
         </button>
         <div className="flex flex-nowrap w-full gap-2 hover:overflow-x-auto custom-scrollbar">
         {
-            uniqueChats?.length > 0 ? uniqueChats.map((action, index) => (
+            actions?.length > 0 ? sortedActions.map((action, index) => (
                 <div className="flex gap-1"  key={index}>
                     <div
                         className={`p-1 rounded-lg flex items-center gap-1 text-nowrap text-sm w-auto ${
@@ -57,7 +64,7 @@ const CleanDataMainHeader = () => {
                                 : "mr-auto bg-secondary text-secondary-foreground"
                         }`}
                     >
-                        <div className="mr-auto bg-secondary text-secondary-foreground w-4 h-4 rounded-full flex justify-center items-center text-xl cursor-pointer" onClick={()=>handleUndo(action.action_id)}><IoClose/></div>{action.chat}
+                        <div className="mr-auto bg-secondary text-secondary-foreground w-4 h-4 rounded-full flex justify-center items-center text-xl cursor-pointer" onClick={()=>handleUndo(action.action_id)}>{(currentAction === index && loading) ? <SmallLoading/> :<IoClose onClick={()=>setCurrentAction(index)}/>}</div>{action.title}
                     </div>
                 </div>
             ))
