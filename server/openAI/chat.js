@@ -70,8 +70,8 @@ export const messages = async (userInput, schema, issues) => {
     5. Ensure that every valid action must must contains a "title" and "response" field for clarity and summarization for "REPLACE_ISSUE_WITH_VALUE" actions as well.
     6. Fill upper row can be interchangeable word with forward fill and lower row can be interchangeable word with backward fill.
     7. Fill word can be interchangeable with replace word.
-    7. Division word can be interchangeable with divide word.
-    8. Don't split single response into multiple responses unless it is distinct response.
+    8. Division word can be interchangeable with divide word.
+    9. Don't split single response into multiple responses unless it is distinct response. 
 
 
     List of acceptable issue types:

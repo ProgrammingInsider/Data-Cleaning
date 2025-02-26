@@ -52,7 +52,7 @@ export const manipulateData = (parsedData, actions, issues) => {
         const validValues = data.map(record => record[column]).filter(val => val !== null && val !== undefined);
         return validValues[Math.floor(Math.random() * validValues.length)];
     };
-
+    
 
     actions.forEach(action => {
         switch (action.type) {
@@ -194,6 +194,8 @@ export const manipulateData = (parsedData, actions, issues) => {
                 case "REMOVE_ROWS_WITH_SPECIFIC_ISSUE":
                     modifiedData = modifiedData.filter((_, index) => {
                         const rowIssues = issuesMap[index + 1] || [];
+                        
+                        // err.issueType === action.issueType
                         return !rowIssues.some(err => err.issueType === action.issueType);
                     });
                     break;
@@ -292,92 +294,91 @@ export const manipulateData = (parsedData, actions, issues) => {
                             }
                             return record;
                         });
-                        break;    
-                
+                        break;
 
-            case "FILL_WITH_UPPER_ROW":
-            case "FILL_WITH_LOWER_ROW":
-                modifiedData = modifiedData.map((record, index, arr) => {
-                    const rowNumber = index + 1;
-                    const rowIssues = issuesMap[rowNumber] || [];
+                case "FILL_WITH_UPPER_ROW":
+                case "FILL_WITH_LOWER_ROW":
+                    modifiedData = modifiedData.map((record, index, arr) => {
+                        const rowNumber = index + 1;
+                        const rowIssues = issuesMap[rowNumber] || [];
 
-                    const hasTargetIssue = rowIssues.some(err => err.column === action.column && err.issueType === action.issueType);
+                        const hasTargetIssue = rowIssues.some(err => err.column === action.column && err.issueType === action.issueType);
 
-                    // Utility function to check for invalid date
-                    const isInvalidDate = (value) => isNaN(Date.parse(value));
+                        // Utility function to check for invalid date
+                        const isInvalidDate = (value) => isNaN(Date.parse(value));
 
-                    // Utility function to check for invalid email
-                    const isInvalidEmail = (value) => value && !/\S+@\S+\.\S+/.test(value);
+                        // Utility function to check for invalid email
+                        const isInvalidEmail = (value) => value && !/\S+@\S+\.\S+/.test(value);
 
-                    // Utility function to check for invalid number
-                    const isInvalidNumber = (value) => isNaN(value);
+                        // Utility function to check for invalid number
+                        const isInvalidNumber = (value) => isNaN(value);
 
-                    // Utility function to check for an empty or invalid string (for columns like 'Name')
-                    const isInvalidString = (value) => typeof value === 'string' && value.trim() === '';
+                        // Utility function to check for an empty or invalid string (for columns like 'Name')
+                        const isInvalidString = (value) => typeof value === 'string' && value.trim() === '';
 
-                    // Check if the column is a name-like column (this can be adjusted based on column names)
-                    const isNameColumn = action.column.toLowerCase() === "name";  // Adjust based on your column names
+                        // Check if the column is a name-like column (this can be adjusted based on column names)
+                        const isNameColumn = action.column.toLowerCase() === "name";  // Adjust based on your column names
 
-                    // Fill with Upper Row or Lower Row depending on the action type
-                    if (hasTargetIssue && (
-                        record[action.column] === null || 
-                        record[action.column] === "" || 
-                        (typeof record[action.column] === 'string' && isInvalidEmail(record[action.column])) || 
-                        (typeof record[action.column] === 'number' && isInvalidNumber(record[action.column])) || 
-                        (typeof record[action.column] === 'string' && isInvalidDate(record[action.column])) || 
-                        (isNameColumn && isInvalidString(record[action.column])))) {
+                        // Fill with Upper Row or Lower Row depending on the action type
+                        if (hasTargetIssue && (
+                            record[action.column] === null || 
+                            record[action.column] === "" || 
+                            (typeof record[action.column] === 'string' && isInvalidEmail(record[action.column])) || 
+                            (typeof record[action.column] === 'number' && isInvalidNumber(record[action.column])) || 
+                            (typeof record[action.column] === 'string' && isInvalidDate(record[action.column])) || 
+                            (isNameColumn && isInvalidString(record[action.column])))) {
 
-                        let adjacentIndex = (action.type === "FILL_WITH_UPPER_ROW") ? index - 1 : index + 1;
+                            let adjacentIndex = (action.type === "FILL_WITH_UPPER_ROW") ? index - 1 : index + 1;
 
-                        while (adjacentIndex >= 0 && adjacentIndex < arr.length) {
-                            const adjacentValue = arr[adjacentIndex][action.column];
+                            while (adjacentIndex >= 0 && adjacentIndex < arr.length) {
+                                const adjacentValue = arr[adjacentIndex][action.column];
 
-                            // Check if the adjacent value is valid (non-null, non-empty, and valid for its type)
-                            if (
-                                adjacentValue !== null &&
-                                adjacentValue !== "" &&
-                                ((typeof adjacentValue === 'string' && !isInvalidEmail(adjacentValue) && !isInvalidString(adjacentValue)) || 
-                                (typeof adjacentValue === 'number' && !isInvalidNumber(adjacentValue)) || 
-                                (typeof adjacentValue === 'string' && !isInvalidDate(adjacentValue)) ||
-                                (isNameColumn && !isInvalidString(adjacentValue)))
-                            ) {
-                                // Set the value from the adjacent row
-                                record[action.column] = adjacentValue;
-                                break;
+                                // Check if the adjacent value is valid (non-null, non-empty, and valid for its type)
+                                if (
+                                    adjacentValue !== null &&
+                                    adjacentValue !== "" &&
+                                    ((typeof adjacentValue === 'string' && !isInvalidEmail(adjacentValue) && !isInvalidString(adjacentValue)) || 
+                                    (typeof adjacentValue === 'number' && !isInvalidNumber(adjacentValue)) || 
+                                    (typeof adjacentValue === 'string' && !isInvalidDate(adjacentValue)) ||
+                                    (isNameColumn && !isInvalidString(adjacentValue)))
+                                ) {
+                                    // Set the value from the adjacent row
+                                    record[action.column] = adjacentValue;
+                                    break;
+                                }
+
+                                // Move to the next adjacent row based on action type
+                                adjacentIndex = (action.type === "FILL_WITH_UPPER_ROW") ? adjacentIndex - 1 : adjacentIndex + 1;
                             }
-
-                            // Move to the next adjacent row based on action type
-                            adjacentIndex = (action.type === "FILL_WITH_UPPER_ROW") ? adjacentIndex - 1 : adjacentIndex + 1;
                         }
-                    }
 
-                    return record;
-                });
-                break;
+                        return record;
+                    });
+                    break;
 
-            case "FILL_WITH_RANDOM":
-                modifiedData = modifiedData.map((record, index) => {
-                    const rowNumber = index + 1;
-                    const rowIssues = issuesMap[rowNumber] || [];
+                case "FILL_WITH_RANDOM":
+                    modifiedData = modifiedData.map((record, index) => {
+                        const rowNumber = index + 1;
+                        const rowIssues = issuesMap[rowNumber] || [];
 
-                    const hasTargetIssue = rowIssues.some(err => err.column === action.column && err.issueType === action.issueType);
+                        const hasTargetIssue = rowIssues.some(err => err.column === action.column && err.issueType === action.issueType);
 
-                    if (hasTargetIssue) {
-                        const randomValue = getRandomValue(modifiedData, action.column);
-                        record[action.column] = randomValue !== undefined ? randomValue : record[action.column];
-                    }
+                        if (hasTargetIssue) {
+                            const randomValue = getRandomValue(modifiedData, action.column);
+                            record[action.column] = randomValue !== undefined ? randomValue : record[action.column];
+                        }
 
-                    return record;
-                });
-                break;
+                        return record;
+                    });
+                    break;
 
                 case "ROUND_COLUMN":
                     modifiedData = modifiedData.map(record => {
-                        const value = record[action.column];
-                        if (value !== null && !isNaN(Number(value))) {  // Avoid converting null
+                        const value = Number(record[action.column]);
+                        if (!isNaN(value)) {
                             const roundAmount = action.by || 0;
                             const factor = Math.pow(10, roundAmount);
-                            record[action.column] = Math.round(Number(value) * factor) / factor;
+                            record[action.column] = Math.round(value * factor) / factor;
                         }
                         return record;
                     });
@@ -427,7 +428,7 @@ export const manipulateData = (parsedData, actions, issues) => {
                     });
                     break;
 
-                case "ADDITION_MULTIPLE_COLUMN":
+                    case "ADDITION_MULTIPLE_COLUMN":
                     modifiedData = modifiedData.map(record => {
                         const sum = action.targetColumn.reduce((acc, col) => {
                             const value = Number(record[col]);
