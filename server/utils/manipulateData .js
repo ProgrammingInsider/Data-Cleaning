@@ -48,9 +48,18 @@ export const manipulateData = (parsedData, actions, issues) => {
     };
     
 
+    // const getRandomValue = (data, column) => {
+    //     const validValues = data.map(record => record[column]).filter(val => val !== null && val !== undefined);
+    //     return validValues[Math.floor(Math.random() * validValues.length)];
+    // };
     const getRandomValue = (data, column) => {
-        const validValues = data.map(record => record[column]).filter(val => val !== null && val !== undefined);
-        return validValues[Math.floor(Math.random() * validValues.length)];
+        const validValues = data
+            .map(record => record[column])
+            .filter(val => val !== null && val !== undefined && val !== ""); // Exclude empty strings too
+    
+        return validValues.length > 0
+            ? validValues[Math.floor(Math.random() * validValues.length)]
+            : null; // Or provide a default value
     };
     
 
@@ -365,6 +374,9 @@ export const manipulateData = (parsedData, actions, issues) => {
 
                         if (hasTargetIssue) {
                             const randomValue = getRandomValue(modifiedData, action.column);
+                            console.log(randomValue);
+                            console.log(rowIssues);
+                            
                             record[action.column] = randomValue !== undefined ? randomValue : record[action.column];
                         }
 

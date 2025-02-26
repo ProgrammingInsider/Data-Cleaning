@@ -1,20 +1,33 @@
 // DatasetsSection.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
 import { FaFileAlt, FaPlus } from "react-icons/fa";
 import Link from "next/link";
 import SmallLoading from "@/components/SmallLoading";
 import { projectType } from "../../utils/types";
+import { useGlobalContext } from "@/context/context";
+import { GetFile } from "@/utils/fileActions";
 
-interface DatasetsSectionProps {
-  projects: projectType[];
-  loading: boolean;
-  cleanDataFileId: string;
-}
-
-export default function DatasetsSection({ projects, loading, cleanDataFileId }: DatasetsSectionProps) {
+export default function DatasetsSection() {
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState<number>(-1);
+  const [projects, setProjects] = useState<projectType[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { cleanDataFileId } = useGlobalContext();
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchProject = async () => {
+      const resp = await GetFile();
+      if (resp?.data.status) {
+        setProjects(resp.data.result);
+      } else {
+        setProjects([]);
+      }
+      setLoading(false);
+    };
+    fetchProject();
+  }, []);
 
   return (
     <div>

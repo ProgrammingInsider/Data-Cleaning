@@ -7,7 +7,7 @@ import { useGlobalContext } from "@/context/context";
 import { useHoverTooltip } from "@/hooks/useHoverTooltip";
 import { TableDataRow } from "@/components/workstationUi/TableDataRow";
 import { LoadingOverlay } from "@/components/workstationUi/LoadingOverlay";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Props } from "@/utils/types";
 
 export default function TablePage({ params }: Props) {
@@ -15,6 +15,18 @@ export default function TablePage({ params }: Props) {
   const tableWidth = Object.keys(schema).length * 5 + "px";
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const { hoveredRowIndex, cursorPosition, isTooltipAbove, handleMouseMove, handleMouseLeave } = useHoverTooltip();
+  const [dataTypes, setDataTypes] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setDataTypes(schema);
+  }, [schema]);
+
+  const handleChange = (key: string, value: string) => {
+    setDataTypes((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   useEffect(() => {
     if (selectedRow !== null && tableContainerRef.current) {
@@ -58,7 +70,21 @@ export default function TablePage({ params }: Props) {
                 <TableRow>
                   <TableHead className="sticky top-0 z-10"></TableHead>
                   {Object.keys(records[0]).map((key, index) => (
-                    <TableHead key={index} className="sticky top-0 z-10 w-[100px]">{key}</TableHead>
+                    <TableHead key={index} className="sticky top-0 z-10 w-[100px] text-center">
+                      {key}
+                      <p className="italic font-normal">
+                        <select
+                          value={dataTypes[key]} // Correctly bind the selected value
+                          onChange={(e) => handleChange(key, e.target.value)} // Update state on change
+                          className="text-gray-500 bg-secondary rounded-md px-2 py-1 focus:outline-none"
+                        >
+                          <option value="string">String</option>
+                          <option value="number">Number</option>
+                          <option value="date">Date</option>
+                          <option value="boolean">Boolean</option>
+                        </select>
+                      </p>
+                    </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>

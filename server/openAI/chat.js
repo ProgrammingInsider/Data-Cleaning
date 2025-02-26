@@ -72,6 +72,8 @@ export const messages = async (userInput, schema, issues) => {
     7. Fill word can be interchangeable with replace word.
     8. Division word can be interchangeable with divide word.
     9. Don't split single response into multiple responses unless it is distinct response. 
+    10. the user may mention a number of decimal places (like "round to 2 decimal places"). Extract this value dynamically.
+    11. When the user specifies the decimal places, use this value in the response (e.g., by: 2 for "round to 2 decimal places").
 
 
     List of acceptable issue types:
