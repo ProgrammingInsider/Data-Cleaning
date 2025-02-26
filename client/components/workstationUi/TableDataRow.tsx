@@ -26,7 +26,7 @@ export const TableDataRow = ({
   isTooltipAbove,
 }: TableDataRowProps) => {
   const rowIssues = issues.find((issue) => issue.row === index + 1);
-  const errorColumns = rowIssues ? rowIssues.errors.map((error) => error.split(": ")[1]) : [];
+  const errorColumns = rowIssues ? rowIssues.errors.map((error) => error.column) : [];
 
   return (
     <TableRow

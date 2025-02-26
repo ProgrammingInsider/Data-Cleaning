@@ -30,6 +30,7 @@ export const CleanData = async (req, res) => {
         `SELECT row_index, errors FROM issues WHERE file_id = ?`,
         [fileId]
     );
+    
 
     if (userFiles.length === 0) {
         return res.status(404).json({
@@ -91,10 +92,21 @@ export const CleanData = async (req, res) => {
             schema = userFiles[0].file_schema; 
         }
     }
-
+    
     if (!fileIssues || fileIssues.length === 0) {
         issues = validateRecords(records, schema);
-    } else {
+        const insertValues = issues.issues.map(issue => [
+            fileId, 
+            userId, 
+            issue.row, 
+            JSON.stringify(issue.errors)
+        ]);
+        await queryDb(
+            `INSERT INTO issues (file_id, user_id, row_index, errors)
+                VALUES ?`,
+            [insertValues]
+        );
+    }else {
         issues = fileIssues.map(issue => ({
             row: issue.row_index,
             errors: issue.errors
@@ -224,7 +236,30 @@ export const CleanData = async (req, res) => {
     //     },
     //     {
     //         type: "REMOVE_ROWS_WITH_NULLS"
-    //     }
+    //     },
+            
+        // // Remove rows based on issues
+        // { type: "REMOVE_ROWS_WITH_ANY_ISSUE" },
+        // { type: "REMOVE_ROWS_WITH_SPECIFIC_ISSUE", issueType: "Null Value" },
+        // { type: "REMOVE_ROWS_WITH_COLUMN_ISSUES", column: "Age" },
+        // { type: "REMOVE_ROWS_WITH_SPECIFIC_COLUMN_ISSUE", column: "Email", issueType: "Invalid Format" },
+
+        // // Replace specific issue values
+        // { type: "REPLACE_ISSUE_WITH_VALUE", column: "Status", targetValue: "Unknown", newValue: "Pending" },
+
+        // // Fill missing values using different strategies
+        // { type: "FILL_WITH_AVERAGE", column: "Salary" },
+        // { type: "FILL_WITH_MEAN", column: "Score" },
+        // { type: "FILL_WITH_MODE", column: "Category" },
+        // { type: "FILL_WITH_UPPER_ROW", column: "Location" },
+        // { type: "FILL_WITH_LOWER_ROW", column: "Department" },
+        // { type: "FILL_WITH_RANDOM", column: "Product" }
+
+    // ];
+
+    // const actions = [
+    //     { type: "DELETE_COLUMN", column: "LoyaltyPoints" },
+    //     { type: "REMOVE_ROWS_WITH_ISSUES", issueType: "Null Value", column: "Age" },
     // ];
     
 
@@ -236,35 +271,46 @@ export const CleanData = async (req, res) => {
 
     // if(fileActions && fileActions.length > 0){
         const actions = fileActions.map(action => action.action_details);
+            records = manipulateData(records, actions, issues);
+            issues = validateRecords(records, generatedSchema(records[0]));
+            schema = generatedSchema(records[0]);
 
-        records = manipulateData(records, actions, issues);
-        issues = validateRecords(records, generatedSchema(records[0]));
 
-        if (JSON.stringify(fileIssues) !== JSON.stringify(issues)) {
-            // Step 1: Delete existing issues for the file_id and user_id
-            await queryDb(
-                `DELETE FROM issues WHERE file_id = ? AND user_id = ?`,
-                [fileId, userId]
-            );
+    //     if (JSON.stringify(fileIssues) !== JSON.stringify(issues)) {
+    //         // Step 1: Delete existing issues for the file_id and user_id
+    //         await queryDb(
+    //             `DELETE FROM issues WHERE file_id = ? AND user_id = ?`,
+    //             [fileId, userId]
+    //         );
         
-            // Step 2: Prepare the batch insert query
-            const insertValues = issues.map(issue => [
-                fileId, 
-                userId, 
-                issue.row, 
-                JSON.stringify(issue.errors)
-            ]);
+    //         // Step 2: Prepare the batch insert query
+    //         const insertValues = issues.issues.map(issue => [
+    //             fileId, 
+    //             userId, 
+    //             issue.row, 
+    //             JSON.stringify(issue.errors)
+    //         ]);
         
-            // Step 3: Perform the batch insert in one query
-            await queryDb(
-                `INSERT INTO issues (file_id, user_id, row_index, errors)
-                 VALUES ?`,
-                [insertValues]
-            );
-        // }
+    //         // Step 3: Perform the batch insert in one query
+    //         // await queryDb(
+    //         //     `INSERT INTO issues (file_id, user_id, row_index, errors)
+    //         //      VALUES ?`,
+    //         //     [insertValues]
+    //         // );
+    //         if (!fileIssues && fileIssues.length === 0) {
+    //             await queryDb(
+    //                 `INSERT INTO issues (file_id, user_id, row_index, errors)
+    //                  VALUES ?`,
+    //                 [insertValues]
+    //             );
+    //         } else {
+    //             console.log('No issues to insert');
+    //         }
+            
+    //     // }
         
         
-    }
+    // }
 
     return res.status(200).json({ 
         status: true, 
@@ -272,7 +318,7 @@ export const CleanData = async (req, res) => {
         length: records.length,
         schema,
         records,
-        issues,
+        issues:issues.issues,
         actions:fileActions
     });
 }

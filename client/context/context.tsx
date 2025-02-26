@@ -2,7 +2,7 @@
 
 import { CleanData } from "@/utils/cleanDataActions";
 import { createContext, useState, useContext, useEffect } from "react";
-import {Action, RecordType, Issue, Payload, Schema} from "../utils/types"
+import {Action, RecordType, Issue, Payload, Schema, } from "../utils/types"
 
 
 interface UserContextType {

@@ -58,17 +58,147 @@
 // };
 
 
+// export const validateRecords = (records, schema) => {
+//     const issues = [];
+//     const seenRecords = new Set(); // For duplicate detection
+
+//     records.forEach((record, index) => {
+//         let rowErrors = [];
+//         let recordKey = JSON.stringify(record); // Convert record to string for uniqueness check
+
+//         // Check for duplicates
+//         if (seenRecords.has(recordKey)) {
+//             rowErrors.push("Duplicate Record");
+//         } else {
+//             seenRecords.add(recordKey);
+//         }
+
+//         for (const key in schema) {
+//             const expectedType = schema[key];
+
+//             // Detect missing fields
+//             if (!(key in record)) {
+//                 rowErrors.push(`Missing Field: ${key}`);
+//                 continue; // Skip further checks for this key
+//             }
+
+//             const value = record[key];
+
+//             // Detect null values separately
+//             if (value === null || value === "") {
+//                 rowErrors.push(`Null Value: ${key}`);
+//                 continue;
+//             }
+
+//             // Detect data type mismatches
+//             if (expectedType === "number" && isNaN(value)) {
+//                 rowErrors.push(`Invalid Number Format: ${key}`);
+//             } else if (expectedType === "date" && isNaN(Date.parse(value))) {
+//                 rowErrors.push(`Invalid Date Format: ${key}`);
+//             } else if (expectedType === "string" && typeof value !== "string") {
+//                 rowErrors.push(`Expected String but found ${typeof value}: ${key}`);
+//             }
+
+//             // Additional validation (e.g., preventing negative numbers)
+//             if (expectedType === "number" && value < 0) {
+//                 rowErrors.push(`Negative Number Not Allowed: ${key}`);
+//             }
+//         }
+
+//         // Append errors to issues array if any
+//         if (rowErrors.length > 0) {
+//             issues.push({
+//                 row: index + 1, // Row number (1-based index)
+//                 errors: rowErrors
+//             });
+//         }
+//     });
+
+//     return issues;
+// };
+
+
+// export const validateRecords = (records, schema) => {
+//     const issues = [];
+//     const seenRecords = new Set(); // For duplicate detection
+
+//     records.forEach((record, index) => {
+//         let rowErrors = [];
+//         let recordKey = JSON.stringify(record); // Convert record to string for uniqueness check
+
+//         // Check for duplicates
+//         if (seenRecords.has(recordKey)) {
+//             rowErrors.push({ issueType: "Duplicate Record", column: null });
+//         } else {
+//             seenRecords.add(recordKey);
+//         }
+
+//         for (const key in schema) {
+//             const expectedType = schema[key];
+
+//             // Detect missing fields
+//             if (!(key in record)) {
+//                 rowErrors.push({ issueType: "Missing Field", column: key });
+//                 continue; // Skip further checks for this key
+//             }
+
+//             const value = record[key];
+
+//             // Detect null values separately
+//             if (value === null || value === "") {
+//                 rowErrors.push({ issueType: "Null Value", column: key });
+//                 continue;
+//             }
+
+//             // Detect data type mismatches
+//             if (expectedType === "number" && isNaN(value)) {
+//                 rowErrors.push({ issueType: "Invalid Number Format", column: key });
+//             } else if (expectedType === "date" && isNaN(Date.parse(value))) {
+//                 rowErrors.push({ issueType: "Invalid Date Format", column: key });
+//             } else if (expectedType === "string" && typeof value !== "string") {
+//                 rowErrors.push({ issueType: `Expected String but found ${typeof value}`, column: key });
+//             }
+
+//             // Additional validation (e.g., preventing negative numbers)
+//             if (expectedType === "number" && value < 0) {
+//                 rowErrors.push({ issueType: "Negative Number Not Allowed", column: key });
+//             }
+//         }
+
+//         // Append errors to issues array if any
+//         if (rowErrors.length > 0) {
+//             issues.push({
+//                 row: index + 1, // Row number (1-based index)
+//                 errors: rowErrors
+//             });
+//         }
+//     });
+
+//     return { issues };
+// };
+
+
+
+
+
+
+
+
+
+
+
 export const validateRecords = (records, schema) => {
     const issues = [];
     const seenRecords = new Set(); // For duplicate detection
+    const rowIssueMap = new Map(); // To track issues with fixed row identifiers
 
     records.forEach((record, index) => {
         let rowErrors = [];
-        let recordKey = JSON.stringify(record); // Convert record to string for uniqueness check
+        let recordKey = JSON.stringify(record); // Unique identifier for each record
 
         // Check for duplicates
         if (seenRecords.has(recordKey)) {
-            rowErrors.push("Duplicate Record");
+            rowErrors.push({ issueType: "Duplicate Record", column: null });
         } else {
             seenRecords.add(recordKey);
         }
@@ -78,7 +208,7 @@ export const validateRecords = (records, schema) => {
 
             // Detect missing fields
             if (!(key in record)) {
-                rowErrors.push(`Missing Field: ${key}`);
+                rowErrors.push({ issueType: "Missing Field", column: key });
                 continue; // Skip further checks for this key
             }
 
@@ -86,33 +216,43 @@ export const validateRecords = (records, schema) => {
 
             // Detect null values separately
             if (value === null || value === "") {
-                rowErrors.push(`Null Value: ${key}`);
+                rowErrors.push({ issueType: "Null Value", column: key });
                 continue;
             }
 
             // Detect data type mismatches
             if (expectedType === "number" && isNaN(value)) {
-                rowErrors.push(`Invalid Number Format: ${key}`);
+                rowErrors.push({ issueType: "Invalid Number Format", column: key });
             } else if (expectedType === "date" && isNaN(Date.parse(value))) {
-                rowErrors.push(`Invalid Date Format: ${key}`);
+                rowErrors.push({ issueType: "Invalid Date Format", column: key });
             } else if (expectedType === "string" && typeof value !== "string") {
-                rowErrors.push(`Expected String but found ${typeof value}: ${key}`);
+                rowErrors.push({ issueType: `Expected String but found ${typeof value}`, column: key });
             }
 
             // Additional validation (e.g., preventing negative numbers)
             if (expectedType === "number" && value < 0) {
-                rowErrors.push(`Negative Number Not Allowed: ${key}`);
+                rowErrors.push({ issueType: "Negative Number Not Allowed", column: key });
             }
         }
 
-        // Append errors to issues array if any
+        // Track issues by the unique record key
         if (rowErrors.length > 0) {
+            rowIssueMap.set(recordKey, rowErrors);
+        }
+    });
+
+    // Convert the rowIssueMap to the issues array with row numbers
+    rowIssueMap.forEach((errors, key) => {
+        // Find the actual row number in the records list
+        const rowIndex = records.findIndex(record => JSON.stringify(record) === key);
+        if (rowIndex !== -1) {
             issues.push({
-                row: index + 1, // Row number (1-based index)
-                errors: rowErrors
+                row: rowIndex + 1, // Row number (1-based index)
+                errors: errors
             });
         }
     });
 
-    return issues;
+    // Return issues array
+    return { issues };
 };

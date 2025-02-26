@@ -3,10 +3,11 @@ import { useState } from "react";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
 import { FaBoxTissue } from "react-icons/fa";
 import SmallLoading from "@/components/SmallLoading";
+import {error} from "@/utils/types"
 
 interface IssueType {
   row: number;
-  errors: string[];
+  errors: error[];
 }
 
 interface IssuesSectionProps {
