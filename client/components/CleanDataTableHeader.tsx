@@ -22,7 +22,7 @@ const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React
     };
     
   return (
-    <header className='flex justify-between items-center sectionBg p-1 px-5 w-full'>
+    <header className='flex justify-between items-center sectionBg p-1 px-5 w-full sticky right-0 left-0'>
         <div className='flex justify-between items-center gap-1'>
                 <span>show:</span>
                 <span className='flex justify-between items-center gap-1'>

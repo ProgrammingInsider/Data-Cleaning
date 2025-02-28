@@ -38,7 +38,7 @@ export default function CleanDataLayout({
     return <>
         <div className="w-screen border-t border-b border-gray-800 flex flex-col overflow-hidden h-screen">
             {expand ? (
-                <div className="fixed inset-0 z-50">{table}</div>
+                table
             ) : <>
                 <CleanDataMainHeader/>
                 <div className="h-[calc(100vh-40px)]">
