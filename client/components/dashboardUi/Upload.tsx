@@ -7,6 +7,83 @@ import { FiUpload } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaFileAlt } from "react-icons/fa";
 import { UploadFile } from '@/utils/fileActions';
+import {SchemaType} from '@/utils/types'
+
+const mockResponse = {
+    "file_id": "6913a04c-f7ba-11ef-a625-0e10fb0c69fb",
+    "schema_definition": {
+        "Id": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "Plate_Number": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "Fleet_Name": {
+            "dataType": "String",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": null
+        },
+        "Total_Price": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 3,
+            "format": null
+        },
+        "Departure_Location": {
+            "dataType": "String",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": null
+        },
+        "Arrival_Location": {
+            "dataType": "String",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": null
+        },
+        "Level": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "Date_Time": {
+            "dataType": "Date",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": "YYYY-MM-DD HH:MM:SS AM/PM"
+        },
+        "Seat_Number": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "registration_date": {
+            "dataType": "Date",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": "YYYY-MM-DD"
+        }
+    }
+}
 
 type categoriesType = {
     category:string;
@@ -19,13 +96,14 @@ const categories: categoriesType[]  = [
     {category:"Research"}
 ]
 
-const initialState : {message: string | null, isCreated: boolean, errors?: Record<string, string[] | undefined>,} = {
+const initialState : {message: string | null, isCreated: boolean, fileSchemaDefinition?: SchemaType | null, errors?: Record<string, string[] | undefined>,} = {
     message: null,
     isCreated: false,
+    fileSchemaDefinition:{file_id:"", schema_definition:{}},
     errors:{},
   }
 
-const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setShowOverlay:React.Dispatch<boolean>, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean}) => {
+const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects, setStep, setSchemaDefinition}:{setShowOverlay:React.Dispatch<boolean>, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean, setStep:React.Dispatch<number>, schemaDefinition:SchemaType | null, setSchemaDefinition:React.Dispatch<React.SetStateAction<SchemaType | null>>}) => {
     const [showCategory, setShowCategory] = useState(false);
     const [category, setCategory] = useState('');
     const [desc, setDesc] = useState('');
@@ -46,7 +124,6 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setS
                 formAction(formData);
                 setLoading(false);
                 setRevalidateProjects(!revalidateProjects);
-                // setUploadedFile(null)
                 });
             }else{
                 setLoading(false);
@@ -78,11 +155,14 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setS
         };
 
         useEffect(() => {
-            if (state?.message) {
+            if (state?.message && state.fileSchemaDefinition) {            
+                // setSchemaDefinition(state.fileSchemaDefinition);
+                setSchemaDefinition(mockResponse);
                 setShowSuccessMessage(true); 
                 setCategory('');
                 setDesc('');
                 setUploadedFile(null);
+                setStep(2);
         
                 const timeout = setTimeout(() => {
                     setShowSuccessMessage(false); 
@@ -95,10 +175,10 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setS
         
 
     return (
-        <div className='sectionBg w-11/12 max-w-2xl p-6 rounded-lg my-11'>
+        <div className='sectionBg full rounded-lg'>
             <div className='flex justify-between items-center mb-10'>
                 <h1 className='heading font-bold text-xl'> Upload Data</h1>
-                <IoIosClose className='text-2xl cursor-pointer' onClick={()=>{setShowOverlay(false)}} />
+                <IoIosClose className='text-2xl cursor-pointer' onClick={()=>{setShowOverlay(false);setStep(1);}} />
             </div>
                 {showSuccessMessage && state?.message && (
                     <div className="flex gap-2">
@@ -181,7 +261,8 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects}:{setS
                         </div>
                     </div>
                     <div className='flex justify-end gap-2 mt-5'>
-                        <button className='secondaryBtn' onClick={()=>{setShowOverlay(false)}}>Cancel</button>
+                
+                        <button className='secondaryBtn' onClick={()=>{setShowOverlay(false);setStep(1)}}>Cancel</button>
                         <button type='submit' className='primaryBtn flex gap-3 items-center' disabled={loading}>
                             {loading ? (
                                 <AiOutlineLoading3Quarters className='animate-spin text-xl' />

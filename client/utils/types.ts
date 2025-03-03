@@ -74,3 +74,21 @@ export interface Payload {
 export interface Schema {
   [key: string]: string; 
 }
+
+export interface schemaTypeDefintion {
+  "dataType": string;
+  "unique": boolean;
+  "numericSign": string | null;
+  "precision": number | null;
+  "format": string | null;
+}
+
+export interface SchemaDefinition {
+  [key: string]: schemaTypeDefintion;
+}
+
+export interface SchemaType {
+  // user_id: string;
+  file_id: string;
+  schema_definition: SchemaDefinition;
+} 

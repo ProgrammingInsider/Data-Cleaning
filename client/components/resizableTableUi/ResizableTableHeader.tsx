@@ -53,8 +53,8 @@ const ResizableTableHeader = ({
                 {key}
                 <p className="italic font-normal">
                     <select
-                        value={dataTypes[key]} // Correctly bind the selected value
-                        onChange={(e) => handleChange(key, e.target.value)} // Update state on change
+                        value={dataTypes[key]}
+                        onChange={(e) => handleChange(key, e.target.value)} 
                         className="text-gray-500 background text-sm rounded-md px-2 py-1 focus:outline-none"
                     >
                         <option value="string">String</option>

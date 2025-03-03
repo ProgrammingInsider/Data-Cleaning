@@ -93,3 +93,26 @@ export const issuesTable = async (pool) => {
     await pool.query(sql);
     console.log("issues table created");
 };
+
+
+// SCHEMA TABLE
+export const schemaTable = async (pool) => {
+    const sql = `
+        CREATE TABLE IF NOT EXISTS FileSchemas (
+        schema_id CHAR(36) NOT NULL DEFAULT (UUID()),
+        user_id CHAR(36) NOT NULL,
+        file_id CHAR(36) NOT NULL UNIQUE,
+        schema_definition JSON NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (schema_id),
+        FOREIGN KEY (file_id) REFERENCES files(file_id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    )`;
+
+    await pool.query(sql);
+    console.log("schema table created");
+};
+
+
+

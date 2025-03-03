@@ -1,6 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
-import { userTable, filesTable, actionsTable, issuesTable } from './creation.js';
+import { userTable, filesTable, actionsTable, issuesTable, schemaTable } from './creation.js';
 
 dotenv.config();
 
@@ -28,6 +28,7 @@ export const Db_connection = async () => {
         await filesTable(pool);
         await actionsTable(pool);
         await issuesTable(pool);
+        await schemaTable(pool);
         
         connection.release();
     } catch (err) {

@@ -85,7 +85,7 @@ export const CleanData = async (req, res) => {
             [JSON.stringify(schema), fileId, userId]
         );
     }else{
-        schema = JSON.parse(userFiles[0].file_schema);
+        // schema = JSON.parse(userFiles[0].file_schema);
         if (typeof userFiles[0].file_schema === "string") {
             schema = JSON.parse(userFiles[0].file_schema);
         } else {

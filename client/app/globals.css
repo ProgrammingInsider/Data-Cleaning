@@ -446,3 +446,15 @@ h1, h2, h3, h4, h5, h6 {
 .rowBg div:nth-child(even) div{
   background-color: var(--secondary);
 }
+
+.selectDataTypes option {
+  background-color: var(--color-section-bg);
+}
+
+.dataTypeColumnContainer div {
+  background-color: var(--color-section-bg);
+}
+
+/* .dataTypeColumnContainer div:nth-child(even) {
+  background-color: var(--secondary);
+} */

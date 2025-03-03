@@ -3,7 +3,7 @@ import express from 'express';
 const routes = express.Router();
 
 // File Controllers
-import { UploadFile, getUserFiles, deleteFile } from '../controllers/File.js';
+import { UploadFile, getUserFiles, deleteFile, getSchema, editSchema } from '../controllers/File.js';
 import { ErrorDetection } from '../controllers/OpenAI.js';
 import { CleanData, FetchActions, DeleteActions, DeleteAllActions } from '../controllers/CleanData.js';
 
@@ -18,6 +18,9 @@ routes.route('/actions').get(FetchActions);
 routes.route('/deleteaction').delete(DeleteActions);
 routes.route('/deleteallaction').delete(DeleteAllActions);
 
+// Schema
+routes.route('/getschema').get(getSchema);
+routes.route('/editschema').put(editSchema);
 
 
 export default routes;
