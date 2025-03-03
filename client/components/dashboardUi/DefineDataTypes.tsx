@@ -7,6 +7,83 @@ import ColumnDataTypeDefinition from './ColumnDataTypeDefinition';
 import {SchemaType, SchemaDefinition} from '@/utils/types'
 import { UpdateSchema } from '@/utils/fileActions';
 
+const mockResponse = {
+    "file_id": "6913a04c-f7ba-11ef-a625-0e10fb0c69fb",
+    "schema_definition": {
+        "Id": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "Plate_Number": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "Fleet_Name": {
+            "dataType": "String",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": null
+        },
+        "Total_Price": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 3,
+            "format": null
+        },
+        "Departure_Location": {
+            "dataType": "String",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": null
+        },
+        "Arrival_Location": {
+            "dataType": "String",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": null
+        },
+        "Level": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "Date_Time": {
+            "dataType": "Date",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": "YYYY-MM-DD HH:MM:SS AM/PM"
+        },
+        "Seat_Number": {
+            "dataType": "Number",
+            "unique": false,
+            "numericSign": "Positive",
+            "precision": 0,
+            "format": null
+        },
+        "registration_date": {
+            "dataType": "Date",
+            "unique": false,
+            "numericSign": null,
+            "precision": null,
+            "format": "YYYY-MM-DD"
+        }
+    }
+}
+
+
 
 const DefineSchema = ({
     setShowOverlay, 
@@ -25,7 +102,8 @@ const DefineSchema = ({
 
     useEffect(() => {
         if(schemaDefinition?.schema_definition){
-            setSchemaTypeDefinition(schemaDefinition.schema_definition);
+            // setSchemaTypeDefinition(schemaDefinition.schema_definition);
+            setSchemaTypeDefinition(mockResponse.schema_definition);
             setFileId(schemaDefinition.file_id);
         }
         
