@@ -9,81 +9,81 @@ import { FaFileAlt } from "react-icons/fa";
 import { UploadFile } from '@/utils/fileActions';
 import {SchemaType} from '@/utils/types'
 
-const mockResponse = {
-    "file_id": "6913a04c-f7ba-11ef-a625-0e10fb0c69fb",
-    "schema_definition": {
-        "Id": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "Plate_Number": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "Fleet_Name": {
-            "dataType": "String",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": null
-        },
-        "Total_Price": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 3,
-            "format": null
-        },
-        "Departure_Location": {
-            "dataType": "String",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": null
-        },
-        "Arrival_Location": {
-            "dataType": "String",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": null
-        },
-        "Level": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "Date_Time": {
-            "dataType": "Date",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": "YYYY-MM-DD HH:MM:SS AM/PM"
-        },
-        "Seat_Number": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "registration_date": {
-            "dataType": "Date",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": "YYYY-MM-DD"
-        }
-    }
-}
+// const mockResponse = {
+//     "file_id": "6913a04c-f7ba-11ef-a625-0e10fb0c69fb",
+//     "schema_definition": {
+//         "Id": {
+//             "dataType": "Number",
+//             "unique": false,
+//             "numericSign": "Positive",
+//             "precision": 0,
+//             "format": null
+//         },
+//         "Plate_Number": {
+//             "dataType": "Number",
+//             "unique": false,
+//             "numericSign": "Positive",
+//             "precision": 0,
+//             "format": null
+//         },
+//         "Fleet_Name": {
+//             "dataType": "String",
+//             "unique": false,
+//             "numericSign": null,
+//             "precision": null,
+//             "format": null
+//         },
+//         "Total_Price": {
+//             "dataType": "Number",
+//             "unique": false,
+//             "numericSign": "Positive",
+//             "precision": 3,
+//             "format": null
+//         },
+//         "Departure_Location": {
+//             "dataType": "String",
+//             "unique": false,
+//             "numericSign": null,
+//             "precision": null,
+//             "format": null
+//         },
+//         "Arrival_Location": {
+//             "dataType": "String",
+//             "unique": false,
+//             "numericSign": null,
+//             "precision": null,
+//             "format": null
+//         },
+//         "Level": {
+//             "dataType": "Number",
+//             "unique": false,
+//             "numericSign": "Positive",
+//             "precision": 0,
+//             "format": null
+//         },
+//         "Date_Time": {
+//             "dataType": "Date",
+//             "unique": false,
+//             "numericSign": null,
+//             "precision": null,
+//             "format": "YYYY-MM-DD HH:MM:SS AM/PM"
+//         },
+//         "Seat_Number": {
+//             "dataType": "Number",
+//             "unique": false,
+//             "numericSign": "Positive",
+//             "precision": 0,
+//             "format": null
+//         },
+//         "registration_date": {
+//             "dataType": "Date",
+//             "unique": false,
+//             "numericSign": null,
+//             "precision": null,
+//             "format": "YYYY-MM-DD"
+//         }
+//     }
+// }
 
 type categoriesType = {
     category:string;
@@ -99,7 +99,7 @@ const categories: categoriesType[]  = [
 const initialState : {message: string | null, isCreated: boolean, fileSchemaDefinition?: SchemaType | null, errors?: Record<string, string[] | undefined>,} = {
     message: null,
     isCreated: false,
-    fileSchemaDefinition:{file_id:"", schema_definition:{}},
+    fileSchemaDefinition:{file_id:"", schema_definition:{}, awareness:""},
     errors:{},
   }
 
@@ -132,14 +132,6 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects, setSt
             
         }
 
-        useEffect(() => {
-            if (state?.message) {
-                setTimeout(() => {
-                    // formAction({ message: null, isCreated: false, errors: {} });
-                }, 5000); 
-            }
-        }, [state, formAction]);
-
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             const file = event.target.files?.[0];
             
@@ -156,8 +148,8 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects, setSt
 
         useEffect(() => {
             if (state?.message && state.fileSchemaDefinition) {            
-                // setSchemaDefinition(state.fileSchemaDefinition);
-                setSchemaDefinition(mockResponse);
+                setSchemaDefinition(state.fileSchemaDefinition);
+                // setSchemaDefinition(mockResponse);
                 setShowSuccessMessage(true); 
                 setCategory('');
                 setDesc('');
@@ -176,26 +168,25 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects, setSt
 
     return (
         <div className='sectionBg full rounded-lg'>
-            <div className='flex justify-between items-center mb-10'>
+            <div className='flex justify-between items-center mb-10 px-6'>
                 <h1 className='heading font-bold text-xl'> Upload Data</h1>
-                <IoIosClose className='text-2xl cursor-pointer' onClick={()=>{setShowOverlay(false);setStep(1);}} />
             </div>
                 {showSuccessMessage && state?.message && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 px-6">
                         <p className="success-message text-green-500 mb-4 font-bold">
                             {state.message}
                         </p>
                     </div>
                 )}
             { showSuccessMessage && state?.errors?.root && <>
-                <div className="flex gap-2">
+                <div className="flex gap-2 px-6">
                     <p className="error-message font-bold mb-4 text-sm">
                         {state?.errors?.root}
                     </p>
                 </div>
             </>}
-            <form onSubmit={handleSubmit} method='POST' className='grid grid-cols-2 gap-8'>
-                <div className='flex flex-col col-span-2 sm:col-span-1'>
+            <form onSubmit={handleSubmit} method='POST' className='grid grid-cols-2 gap-8 p-6'>
+                <div className='flex flex-col col-span-2 sm:col-span-1 z-10'>
                     <p className='heading text-sm flex gap-1 items-center font-bold'><FaFileAlt className='text-green-500' /> Upload File (CSV, Excel)</p>
                     <label htmlFor='file' className='flex flex-col gap-2 justify-center items-center border-2 border-dashed border-gray-500 h-36 rounded-md mt-7 cursor-pointer'>
                         <FiUpload className='font-bold text-6xl primary' />
@@ -238,7 +229,7 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects, setSt
                         <p className="error-message mb-2">{state.errors.category}</p>
                     )}
                 </div>
-                <div className='col-span-2 sm:col-span-1'>
+                <div className='col-span-2 sm:col-span-1 z-10'>
                     <div>
                         <label className='heading font-bold text-lg inline-block mb-2'>Project Description</label>
                         <textarea name='description' rows={2} placeholder='Enter project description' className='w-full inputBg p-2 rounded-md' value={desc} onChange={(e)=>{setDesc(e.target.value)}}>
@@ -260,20 +251,20 @@ const Upload = ({setShowOverlay, setRevalidateProjects,revalidateProjects, setSt
                             )}
                         </div>
                     </div>
-                    <div className='flex justify-end gap-2 mt-5'>
-                
-                        <button className='secondaryBtn' onClick={()=>{setShowOverlay(false);setStep(1)}}>Cancel</button>
-                        <button type='submit' className='primaryBtn flex gap-3 items-center' disabled={loading}>
-                            {loading ? (
-                                <AiOutlineLoading3Quarters className='animate-spin text-xl' />
-                            ) : (
-                                <FiUpload className='font-bold text-xl' />
-                            )}
-                            Upload
-                        </button>
-                    </div>
                 </div>
 
+                <div  className='w-full flex gap-3 justify-end items-center pr-3 border-t pt-3 sticky bottom-0 shadow col-span-2 z-0'>
+            
+                    <button className='secondaryBtn' onClick={()=>{setShowOverlay(false);setStep(1)}}>Cancel</button>
+                    <button type='submit' className='primaryBtn flex gap-3 items-center' disabled={loading}>
+                        {loading ? (
+                            <AiOutlineLoading3Quarters className='animate-spin text-xl' />
+                        ) : (
+                            <FiUpload className='font-bold text-xl' />
+                        )}
+                        Upload
+                    </button>
+                </div>
             </form>
         </div>
     )

@@ -44,11 +44,13 @@ export const messages = async (parsedData) => {
 
   {
     "schema_definition": {
-      "ColumnName1": { "dataType": "String", "unique": false, "numericSign": null, "precision": null, "format": null },
-      "ColumnName2": { "dataType": "Number", "unique": false, "numericSign": "Positive", "precision": 2, "format": null },
-      "SignupDate": { "dataType": "Date", "unique": false, "numericSign": null, "precision": null, "format": "YYYY-MM-DD" }
+      "ColumnName1": { "dataType": "String", "unique": false, "numericSign": null, "precision": null, "format": null, desc: null },
+      "ColumnName2": { "dataType": "Number", "unique": false, "numericSign": "Positive", "precision": 2, "format": null, desc: null },
+      "SignupDate": { "dataType": "Date", "unique": false, "numericSign": null, "precision": null, "format": "YYYY-MM-DD", desc: null }
     }
   }
+
+  desc: property is just to describe the column shortly. If you don't understand the column purpose leave it null. But if it is familiar with you fill it with very short description.
 `;
 
   const userMessage = {
@@ -100,6 +102,9 @@ export const response_format = {
               format: { 
                 type: "string", 
                 enum: ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD", null] 
+              },
+              desc: { 
+                type: ["string", "null"], 
               },
             }
           }

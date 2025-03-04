@@ -102,6 +102,7 @@ export const schemaTable = async (pool) => {
         schema_id CHAR(36) NOT NULL DEFAULT (UUID()),
         user_id CHAR(36) NOT NULL,
         file_id CHAR(36) NOT NULL UNIQUE,
+        awareness VARCHAR(255) NOT NULL,
         schema_definition JSON NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

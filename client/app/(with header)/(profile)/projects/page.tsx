@@ -14,10 +14,10 @@ const Dashboard = () => {
   const [search, setSearch] = useState<string>("");
   const [viewCategory, setViewCategory] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showOverlay, setShowOverlay] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [revalidateProjects, setRevalidateProjects] = useState<boolean>(false);
   const [projects, setProjects] = useState<projectType[]>([]);
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,7 +87,14 @@ const Dashboard = () => {
       {/* Project Lists */}
       <main className="grid grid-cols-6 mt-4 gap-4">
         {filteredProjects.length > 0 ? (
-          filteredProjects.map((project) => <ProjectCard key={project.file_id} project={project} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} />)
+          filteredProjects.map((project) => <ProjectCard 
+              key={project.file_id} 
+              project={project} 
+              setRevalidateProjects={setRevalidateProjects} 
+              revalidateProjects={revalidateProjects} 
+              setShowOverlay={setShowOverlay}
+              setStep={setStep}
+              />)
         ) : (
           <p className="col-span-6 text-center text-gray-500">{loading ? <Loading/>:"No projects found."}</p>
         )}

@@ -143,26 +143,6 @@ export const DeleteFile = async (fileId:string) => {
     }
 }
 
-// export const ErrorReport = async(fileId:string) => {
-//     const cookieStore = await cookies();
-//     const accessTokenCookie = cookieStore.get("accessToken")?.value;
-    
-//     try{
-
-//         const {data} = await axiosPrivate.post("/errordetection",{fileId},{
-//             headers: {
-//                 Authorization: `Bearer ${accessTokenCookie}`, 
-//             },
-//         });
-        
-//         return {data};
-//     }catch(error){
-
-//         console.log(error);
-        
-//     }
-// }
-
 
 interface ErrorResponse {
     message?: string;
@@ -292,3 +272,28 @@ export const UpdateSchema = async (UpdatedSchema:SchemaType) => {
         return { success: false, message: (error as Error).message || "Request setup failed." };
     }
 };
+
+
+export const getSchema = async (fileId:string) => {
+    const cookieStore = await cookies();
+    const accessTokenCookie = cookieStore.get("accessToken")?.value;
+    
+    try{
+
+        const {data} = await axiosPrivate.get(`/getschema?fileid=${fileId}`,{
+            headers: {
+                Authorization: `Bearer ${accessTokenCookie}`, 
+            },
+        });
+        
+        return {data};
+    }catch(error){
+
+    if(error){
+        return {
+            message: '',
+            errors: { root: ["Something went wrong. Please try again!"] },
+        };
+    }
+    }
+}

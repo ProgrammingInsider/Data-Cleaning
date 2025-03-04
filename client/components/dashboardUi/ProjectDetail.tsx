@@ -1,21 +1,37 @@
 'use client'
 
 import React, { useState } from 'react'
-import {projectType} from '../utils/types'
-import Progress from './Progress';
-import ProgressStatus from './ProgressStatus';
+import {projectType} from '../../utils/types'
+import Progress from '../Progress';
+import ProgressStatus from '../ProgressStatus';
 import { IoMdClose } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { DeleteFile } from '@/utils/fileActions';
 import Link from 'next/link';
+import { useGlobalContext } from '@/context/context';
 
-
-const ProjectDetail = ({project, setShowDetail, showDetail, setRevalidateProjects, revalidateProjects}:{project:projectType, setShowDetail:React.Dispatch<React.SetStateAction<boolean>>, showDetail:boolean, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean}) => {
+const ProjectDetail = ({
+    project, 
+    setShowDetail, 
+    showDetail, 
+    setRevalidateProjects, 
+    revalidateProjects,
+    setShowOverlay,
+    setStep,
+}:{
+    project:projectType, 
+    setShowDetail:React.Dispatch<React.SetStateAction<boolean>>, 
+    showDetail:boolean, setRevalidateProjects:React.Dispatch<boolean>,
+    revalidateProjects:boolean,
+    setShowOverlay:React.Dispatch<React.SetStateAction<boolean>>
+    setStep:React.Dispatch<React.SetStateAction<number>>,
+}) => {
     const [loading, setLoading] = useState(false);
 
     const {file_id,original_name,description,category,progress} = project;
+    const {setCleanDataFileId} = useGlobalContext();
     
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this file?");
@@ -51,7 +67,10 @@ const ProjectDetail = ({project, setShowDetail, showDetail, setRevalidateProject
                 <p className='text-sm'>Progress</p>
                 <Progress progress={progress} />
             </div>
+            <a className='hover:primary underline text-sm cursor-pointer hidden' onClick={()=>{setShowOverlay(true);setStep(2);setCleanDataFileId(file_id)}} >Update Schema Type Definition</a>
+            <a className='hover:primary underline text-sm cursor-pointer'>Update Schema Type Definition</a>
         </div>
+    
         <div className='flex flex-col gap-2 items-center'>
             <Link href={`/errordetection/${file_id}`} type='submit' className='w-full primaryBtn flex gap-3 items-center text-center text-base'>
                 <BiError  className='font-bold text-xl' />

@@ -4,13 +4,25 @@
 import {useState} from 'react'
 import { FaGear } from "react-icons/fa6";
 import { SiGoogleanalytics } from "react-icons/si";
-import ProjectDetail from './ProjectDetail';
+import ProjectDetail from './dashboardUi/ProjectDetail';
 import {projectType} from '../utils/types'
 import Progress from './Progress';
 import ProgressStatus from './ProgressStatus';
 import Link from 'next/link';
 
-const ProjectCard = ({project, setRevalidateProjects, revalidateProjects}:{project:projectType, setRevalidateProjects:React.Dispatch<boolean>,revalidateProjects:boolean}) => {
+const ProjectCard = ({
+  project, 
+  setRevalidateProjects, 
+  revalidateProjects,
+  setShowOverlay,
+  setStep,
+}:{
+  project:projectType, 
+  setRevalidateProjects:React.Dispatch<boolean>,
+  revalidateProjects:boolean,
+  setShowOverlay:React.Dispatch<React.SetStateAction<boolean>>
+  setStep:React.Dispatch<React.SetStateAction<number>>,
+}) => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
     const {file_id,original_name,description,category,progress} = project;
 
@@ -40,7 +52,15 @@ const ProjectCard = ({project, setRevalidateProjects, revalidateProjects}:{proje
         {showDetail && <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center overflow-y-scroll pt-40 sm:pt-10 md:pt-0 custom-scrollbar"
         >
-            <ProjectDetail project={project} setShowDetail={setShowDetail} showDetail={showDetail} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} />
+            <ProjectDetail 
+              project={project} 
+              setShowDetail={setShowDetail} 
+              showDetail={showDetail} 
+              setRevalidateProjects={setRevalidateProjects} 
+              revalidateProjects={revalidateProjects} 
+              setShowOverlay={setShowOverlay}
+              setStep={setStep}
+            />
         </div>
 
         }

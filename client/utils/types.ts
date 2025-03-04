@@ -81,6 +81,7 @@ export interface schemaTypeDefintion {
   "numericSign": string | null;
   "precision": number | null;
   "format": string | null;
+  "desc": string | null;
 }
 
 export interface SchemaDefinition {
@@ -91,4 +92,5 @@ export interface SchemaType {
   // user_id: string;
   file_id: string;
   schema_definition: SchemaDefinition;
+  awareness: string;
 } 

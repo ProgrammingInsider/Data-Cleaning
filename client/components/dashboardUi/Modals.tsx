@@ -25,11 +25,11 @@ const Modals = ({
   >
       <div className="flex flex-col gap-3 sectionBg w-11/12 max-w-3xl rounded-lg my-6 overflow-y-auto h-[90vh] custom-scrollbar relative">
 
-        <StepIndicator step={step} setStep={setStep}/>
+        <StepIndicator step={step}/>
         
-        <div className="flex flex-col justify-center items-center p-6">
+        <div className="flex flex-col justify-center items-center">
           {step === 1 && <Upload setShowOverlay={setShowOverlay} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} setStep={setStep} schemaDefinition={schemaDefinition} setSchemaDefinition={setSchemaDefinition} />}
-          {step === 2 && <DefineSchema setShowOverlay={setShowOverlay} setRevalidateProjects={setRevalidateProjects} revalidateProjects={revalidateProjects} schemaDefinition={schemaDefinition} setStep={setStep}  />}
+          {step === 2 && <DefineSchema setShowOverlay={setShowOverlay} schemaDefinition={schemaDefinition} setStep={setStep}  />}
         </div>
       </div>
   </div>

@@ -1,82 +1,6 @@
 import React from 'react';
 import {schemaTypeDefintion, SchemaDefinition} from '@/utils/types'
 
-const mockResponse = {
-    "file_id": "6913a04c-f7ba-11ef-a625-0e10fb0c69fb",
-    "schema_definition": {
-        "Id": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "Plate_Number": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "Fleet_Name": {
-            "dataType": "String",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": null
-        },
-        "Total_Price": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 3,
-            "format": null
-        },
-        "Departure_Location": {
-            "dataType": "String",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": null
-        },
-        "Arrival_Location": {
-            "dataType": "String",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": null
-        },
-        "Level": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "Date_Time": {
-            "dataType": "Date",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": "YYYY-MM-DD HH:MM:SS AM/PM"
-        },
-        "Seat_Number": {
-            "dataType": "Number",
-            "unique": false,
-            "numericSign": "Positive",
-            "precision": 0,
-            "format": null
-        },
-        "registration_date": {
-            "dataType": "Date",
-            "unique": false,
-            "numericSign": null,
-            "precision": null,
-            "format": "YYYY-MM-DD"
-        }
-    }
-}
-
 const ColumnDataTypeDefinition = ({
     SchemaDefinition,
     setSchemaDefinition,
@@ -103,7 +27,7 @@ const ColumnDataTypeDefinition = ({
 
     return (
         <div className="w-full dataTypeColumnContainer">
-            {Object.keys(mockResponse.schema_definition).map((key, index) => {
+            {Object.keys(SchemaDefinition).map((key, index) => {
                 const columnData = SchemaDefinition[key];
 
                 return (
@@ -116,14 +40,16 @@ const ColumnDataTypeDefinition = ({
                         <div className="flex gap-2 flex-wrap w-full">
                             {/* Column Type */}
                             <div className="w-auto p-4 rounded-lg">
-                                <h4 className="mb-2 text-sm font-semibold para">Column Type:</h4>
+                                <h4 className="mb-2 text-sm font-semibold para">Data Type:</h4>
                                 <select
                                     value={columnData.dataType}
                                     onChange={(e) => handleChange(key, "dataType", e.target.value)}
                                     className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 focus:outline-none"
                                 >
                                     <option value="String">String</option>
-                                    <option value="Number">Number</option>
+                                    <option value="Integer">Integer</option>
+                                    <option value="Float">Float</option>
+                                    <option value="Email">Email</option>
                                     <option value="Boolean">Boolean</option>
                                     <option value="Date">Date</option>
                                     <option value="All">Allow all types</option>
@@ -137,7 +63,7 @@ const ColumnDataTypeDefinition = ({
                                     value={columnData.numericSign || "null"}
                                     onChange={(e) => handleChange(key, "numericSign", e.target.value !== "null" ? e.target.value : null)}
                                     className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 focus:outline-none disabled:opacity-50"
-                                    disabled={(columnData.dataType !== "Number") && (columnData.dataType !== "All")}
+                                    disabled={(columnData.dataType !== "Integer") && (columnData.dataType !== "Float") && (columnData.dataType !== "All")}
                                 >
                                     <option value="Positive">Positive Only</option>
                                     <option value="Negative">Negative Only</option>
@@ -152,7 +78,7 @@ const ColumnDataTypeDefinition = ({
                                     value={columnData.precision || "null"}
                                     onChange={(e) => handleChange(key, "precision", e.target.value !== "null" ? e.target.value : null)}
                                     className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 focus:outline-none disabled:opacity-50"
-                                    disabled={(columnData.dataType !== "Number") && (columnData.dataType !== "All")}
+                                    disabled={(columnData.dataType !== "Float") && (columnData.dataType !== "Number") && (columnData.dataType !== "All")}
                                 >
                                     <option value="null">No Limit</option>
                                     <option value={0}>0 (Whole numbers only)</option>
@@ -191,6 +117,12 @@ const ColumnDataTypeDefinition = ({
                                     <option value="YYYY/MM/DD">YYYY/MM/DD</option>
                                     <option value="null">Allow all formats</option>
                                 </select>
+                            </div>
+
+                            {/* Description */}
+                            <div className="w-full p-4 rounded-lg">
+                                <h4 className="mb-2 text-sm font-semibold para">Description:</h4>
+                                <textarea rows={3}  className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 resize-none focus:outline-none disabled:opacity-50" placeholder='Describe the column' onChange={(e) => handleChange(key, "desc", e.target.value)} value={columnData.desc || "Describe the column"}></textarea>
                             </div>
                         </div>
                     </div>

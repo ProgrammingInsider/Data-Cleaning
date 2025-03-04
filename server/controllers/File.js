@@ -156,20 +156,19 @@ export const getSchema = async(req, res) => {
 }
 
 export const editSchema = async(req, res) => {
-    const {file_id, schema_definition} = req.body;
+    const {file_id, schema_definition, awareness} = req.body;
     const { userId } = req.user;
 
     if(!file_id && !schema_definition && !userId){
         throw new BadRequestError("Please provide all required information.");
     }
 
-    console.log(file_id, schema_definition);
-    
+    console.log(awareness);
 
     // INSERT USER INTO DATABASE
     const updateSchema = await queryDb(
-        `UPDATE FileSchemas SET  schema_definition = ? WHERE file_id = ? AND user_id = ?`,
-        [JSON.stringify(schema_definition), file_id, userId]
+        `UPDATE FileSchemas SET  schema_definition = ?, awareness = ? WHERE file_id = ? AND user_id = ?`,
+        [JSON.stringify(schema_definition), awareness, file_id, userId]
     );
 
     console.log(updateSchema);
