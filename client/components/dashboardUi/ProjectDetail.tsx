@@ -67,8 +67,7 @@ const ProjectDetail = ({
                 <p className='text-sm'>Progress</p>
                 <Progress progress={progress} />
             </div>
-            <a className='hover:primary underline text-sm cursor-pointer hidden' onClick={()=>{setShowOverlay(true);setStep(2);setCleanDataFileId(file_id)}} >Update Schema Type Definition</a>
-            <a className='hover:primary underline text-sm cursor-pointer'>Update Schema Type Definition</a>
+            <a className='hover:primary underline text-sm cursor-pointer' onClick={()=>{setShowOverlay(true);setStep(2);setCleanDataFileId(file_id)}} >Update Schema Type Definition</a>
         </div>
     
         <div className='flex flex-col gap-2 items-center'>
