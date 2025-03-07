@@ -12,7 +12,8 @@ import {
     temperature, 
     top_p } from "../openAI/chat.js";
 import openai from "../config/openaiConfig.js";
-import BadRequestError from "../errors/bad-request.js";
+import {BadRequestError, NotFoundError} from "../errors/index.js";
+import { validateParsedData } from "../utils/validateParsedData.js";
 
 export const CleanData = async (req, res) => {
     const { userId } = req.user;
@@ -24,19 +25,20 @@ export const CleanData = async (req, res) => {
         [fileId,userId]
     );
 
-
     // Fetch issues from the database
     const fileIssues = await queryDb(
         `SELECT row_index, errors FROM issues WHERE file_id = ?`,
         [fileId]
     );
     
+    // Fetch schema from the database
+    const fetchSchema = await queryDb(
+        `SELECT schema_definition FROM FileSchemas WHERE file_id = ? AND user_id = ?`,
+        [fileId,userId]
+    );
 
     if (userFiles.length === 0) {
-        return res.status(404).json({
-            status: false,
-            message: "No file found for the given user and file ID.",
-        });
+        throw new NotFoundError("No file found for the given user and file ID.");
     }
 
     const fileKey = userFiles[0].file_key;
@@ -44,14 +46,11 @@ export const CleanData = async (req, res) => {
     const parsedData = await ParseS3File({ fileKey })
 
     if (!parsedData || Object.keys(parsedData).length === 0) {
-        return res.status(400).json({ 
-            status: false, 
-            message: "Parsed data is invalid or empty" 
-        });
+        throw new BadRequestError("Parsed data is invalid or empty");
     }
 
     let records;
-    let schema;
+    // let schema;
     let issues;
     let aiResponse;
     
@@ -65,42 +64,41 @@ export const CleanData = async (req, res) => {
     }
 
     if (!Array.isArray(records) || records.length === 0) {
-        return res.status(400).json({ 
-            status: false, 
-            message: "No valid data found" 
-        });
+        throw new BadRequestError("No valid data found" );
     }
 
     // Construct schema dynamically from the first record
     const firstRecord = records[0];
-
-    if (!userFiles[0].file_schema || Object.keys(userFiles[0].file_schema).length === 0){
-        schema = generatedSchema(firstRecord);
+    
+    // if (!userFiles[0].file_schema || Object.keys(userFiles[0].file_schema).length === 0){
+    //     schema = generatedSchema(firstRecord);
         
-        // Update the database with the schema
-        await queryDb(
-            `UPDATE files 
-            SET file_schema = ? 
-            WHERE file_id = ? AND user_id = ?`,
-            [JSON.stringify(schema), fileId, userId]
-        );
-    }else{
-        // schema = JSON.parse(userFiles[0].file_schema);
-        if (typeof userFiles[0].file_schema === "string") {
-            schema = JSON.parse(userFiles[0].file_schema);
-        } else {
-            schema = userFiles[0].file_schema; 
-        }
-    }
+    //     // Update the database with the schema
+    //     // await queryDb(
+    //     //     `UPDATE files 
+    //     //     SET file_schema = ? 
+    //     //     WHERE file_id = ? AND user_id = ?`,
+    //     //     [JSON.stringify(schema), fileId, userId]
+    //     // );
+    // }else{
+    //     // schema = JSON.parse(userFiles[0].file_schema);
+    //     if (typeof userFiles[0].file_schema === "string") {
+    //         schema = JSON.parse(userFiles[0].file_schema);
+    //     } else {
+    //         schema = userFiles[0].file_schema; 
+    //     }
+    // }
     
     if (!fileIssues || fileIssues.length === 0) {
-        issues = validateRecords(records, schema);
-        const insertValues = issues.issues.map(issue => [
+        // issues = validateRecords(records, schema);
+        const issues = validateParsedData(records,fetchSchema[0].schema_definition)
+        const insertValues = issues.map(issue => [
             fileId, 
             userId, 
             issue.row, 
             JSON.stringify(issue.errors)
         ]);
+        
         await queryDb(
             `INSERT INTO issues (file_id, user_id, row_index, errors)
                 VALUES ?`,
@@ -116,7 +114,7 @@ export const CleanData = async (req, res) => {
     if(chat){
         const openAiPayload = {
             model: "gpt-4o-mini",
-            messages: await messages(chat, schema, issues),
+            messages: await messages(chat, fetchSchema[0].schema_definition, issues),
             max_tokens: max_completion_tokens,
             temperature: temperature,
             top_p: top_p,
@@ -272,8 +270,10 @@ export const CleanData = async (req, res) => {
     // if(fileActions && fileActions.length > 0){
         const actions = fileActions.map(action => action.action_details);
             records = manipulateData(records, actions, issues);
-            issues = validateRecords(records, generatedSchema(records[0]));
-            schema = generatedSchema(records[0]);
+            // schema = generatedSchema(records[0]);
+            // issues = validateRecords(records, generatedSchema(records[0]));
+            issues = validateParsedData(records,fetchSchema[0].schema_definition);
+            console.log("Third Issues ",issues.errors);
 
 
     //     if (JSON.stringify(fileIssues) !== JSON.stringify(issues)) {
@@ -316,9 +316,9 @@ export const CleanData = async (req, res) => {
         status: true, 
         message: "Fetched successfully",
         length: records.length,
-        schema,
+        schema:fetchSchema[0].schema_definition,
         records,
-        issues:issues.issues,
+        issues:issues,
         actions:fileActions
     });
 }

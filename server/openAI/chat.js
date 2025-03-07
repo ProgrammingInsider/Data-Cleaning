@@ -77,10 +77,12 @@ export const messages = async (userInput, schema, issues) => {
 
 
     List of acceptable issue types:
-  - "Duplicate records", "Missing Fields", "Null Values", "Invalid Number Format", "Invalid Date Format", "Expected String But Found", "Negative Number Not Allowed".
+  - "NULL_VALUE", "DUPLICATE_VALUE", "TYPE_MISMATCH", "INVALID_VALUE", "INVALID_FORMAT", "INVALID_SEPARATOR", "INVALID_DATE".
 
   The output **must** match the schema keys exactly (case-sensitive). If a column doesn't exist in the schema, ignore the request.
   `;
+
+  // "Duplicate records", "Missing Fields", "Null Values", "Invalid Number Format", "Invalid Date Format", "Expected String But Found", "Negative Number Not Allowed".
 
   const userMessage = {
     role: "user",

@@ -73,7 +73,7 @@ const ResizableTableRow = ({
                     className={`relative px-2 py-1 z-10 text-nowrap ${errorColumns.includes(key) ? "bg-red-600/60" : ""} font-medium`}
                     style={{ width: `${columnWidths[key]}px`, minWidth: "50px" }}
                 >
-                    {hoveredRowIndex === rowIndex && rowIssues && editCell === "" && (
+                    {hoveredRowIndex === rowIndex && rowIssues && (
                         <Tooltip issues={rowIssues.errors} cursorPosition={cursorPosition} isTooltipAbove={isTooltipAbove} />
                     )}
                     

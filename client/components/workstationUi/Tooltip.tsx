@@ -39,7 +39,7 @@ export const Tooltip = ({
       {issues.map((error, idx) => (
         <li key={idx} className="ml-4 list-disc">
           On column <b>{error.column}:&nbsp;</b>
-          {error.issueType}
+          {error.issueDesc}
         </li>
       ))}
     </ul>

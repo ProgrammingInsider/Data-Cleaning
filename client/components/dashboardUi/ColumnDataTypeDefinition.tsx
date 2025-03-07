@@ -1,5 +1,5 @@
 import React from 'react';
-import {schemaTypeDefintion, SchemaDefinition} from '@/utils/types'
+import {schemaTypeDefinition, SchemaDefinition} from '@/utils/types'
 
 const ColumnDataTypeDefinition = ({
     SchemaDefinition,
@@ -12,7 +12,7 @@ const ColumnDataTypeDefinition = ({
 }) => {
 
     // Function to update SchemaDefinition when a value changes
-    const handleChange = (key: string, field: keyof schemaTypeDefintion, value: string | boolean | null) => {
+    const handleChange = (key: string, field: keyof schemaTypeDefinition, value: string | boolean | null | number) => {
         setLoading(true);
         setSchemaDefinition((prevSchema) => ({
             ...prevSchema,
@@ -67,7 +67,7 @@ const ColumnDataTypeDefinition = ({
                                 >
                                     <option value="Positive">Positive Only</option>
                                     <option value="Negative">Negative Only</option>
-                                    <option value="null">No Constraint</option>
+                                    <option value="">No Constraint</option>
                                 </select>
                             </div>
 
@@ -80,7 +80,7 @@ const ColumnDataTypeDefinition = ({
                                     className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 focus:outline-none disabled:opacity-50"
                                     disabled={(columnData.dataType !== "Float") && (columnData.dataType !== "Number") && (columnData.dataType !== "All")}
                                 >
-                                    <option value="null">No Limit</option>
+                                    <option value="">No Limit</option>
                                     <option value={0}>0 (Whole numbers only)</option>
                                     <option value={1}>1 decimal place</option>
                                     <option value={2}>2 decimal places</option>
@@ -98,7 +98,7 @@ const ColumnDataTypeDefinition = ({
                                     onChange={(e) => handleChange(key, "unique", e.target.value === "Unique")}
                                     className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 focus:outline-none"
                                 >
-                                    <option value="null">Non-Unique (Duplicates permitted)</option>
+                                    <option value="">Non-Unique (Duplicates permitted)</option>
                                     <option value="Unique">Unique (No duplicates allowed)</option>
                                 </select>
                             </div>
@@ -115,14 +115,30 @@ const ColumnDataTypeDefinition = ({
                                     <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                                     <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                                     <option value="YYYY/MM/DD">YYYY/MM/DD</option>
-                                    <option value="null">Allow all formats</option>
+                                    <option value="">Allow all formats</option>
+                                </select>
+                            </div>
+
+                            {/* Date Separator */}
+                            <div className="w-auto p-4 rounded-lg">
+                                <h4 className="mb-2 text-sm font-semibold para">Date Separator:</h4>
+                                <select
+                                    value={columnData.separator || "null"}
+                                    onChange={(e) => handleChange(key, "separator", e.target.value !== "null" ? e.target.value : null)}
+                                    className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 focus:outline-none disabled:opacity-50"
+                                    disabled={(columnData.dataType !== "Date") && (columnData.dataType !== "All")}
+                                >
+                                    <option value="/">/</option>
+                                    <option value="-">-</option>
+                                    <option value=",">,</option>
+                                    <option value=".">.</option>
                                 </select>
                             </div>
 
                             {/* Description */}
                             <div className="w-full p-4 rounded-lg">
                                 <h4 className="mb-2 text-sm font-semibold para">Description:</h4>
-                                <textarea rows={3}  className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 resize-none focus:outline-none disabled:opacity-50" placeholder='Describe the column' onChange={(e) => handleChange(key, "desc", e.target.value)} value={columnData.desc || "Describe the column"}></textarea>
+                                <textarea rows={3}  className="w-full font-medium secondaryBg text-sm rounded-md px-2 py-1 resize-none focus:outline-none disabled:opacity-50" placeholder='Describe the column' onChange={(e) => handleChange(key, "desc", e.target.value)} value={columnData.desc || ""}></textarea>
                             </div>
                         </div>
                     </div>

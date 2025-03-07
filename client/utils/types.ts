@@ -59,6 +59,7 @@ export interface RecordType {
 export interface error {
   column: string;
   issueType: string;
+  issueDesc: string;
 }
 export interface Issue {
   row: number;
@@ -75,17 +76,18 @@ export interface Schema {
   [key: string]: string; 
 }
 
-export interface schemaTypeDefintion {
+export interface schemaTypeDefinition {
   "dataType": string;
   "unique": boolean;
   "numericSign": string | null;
   "precision": number | null;
   "format": string | null;
+  "separator": string | null;
   "desc": string | null;
 }
 
 export interface SchemaDefinition {
-  [key: string]: schemaTypeDefintion;
+  [key: string]: schemaTypeDefinition;
 }
 
 export interface SchemaType {

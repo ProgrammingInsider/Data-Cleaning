@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 import { BadRequestError } from "../errors/index.js";
 import { Readable } from "stream";
 
-export const ParseS3File = async ({ fileKey }) => {
+export const ParseS3File = async ({ fileKey, numOfRows = Infinity }) => {
   if (!fileKey) {
     throw new BadRequestError("File key is required.");
   }
@@ -38,9 +38,9 @@ export const ParseS3File = async ({ fileKey }) => {
     // Parse based on file type
     let parsedData;
     if (fileExt === "csv") {
-      parsedData = await parseCSV(fileBuffer);
+      parsedData = await parseCSV(fileBuffer, numOfRows);
     } else if (["xls", "xlsx"].includes(fileExt)) {
-      parsedData = parseExcel(fileBuffer);
+      parsedData = parseExcel(fileBuffer, numOfRows);
     } else if (fileExt === "json") {
       parsedData = JSON.parse(fileBuffer.toString("utf-8"));
     } else {
@@ -77,36 +77,105 @@ const convertNumbers = (obj) => {
 };
 
 
-// Helper function to parse CSV
-const parseCSV = (fileBuffer) => {
+const parseCSV = (fileBuffer, numOfRows) => {
   return new Promise((resolve, reject) => {
     const results = [];
     const stream = Readable.from(fileBuffer.toString("utf-8"));
+    let rowCount = 0;
+    
+    // Instead of processing the entire file, we limit row count
     stream
       .pipe(csv())
-      .on("data", (data) => results.push(convertNumbers(data)))
+      .on("data", (data) => {
+        if (rowCount < numOfRows) {
+          const rowWithIndex = { ...convertNumbers(data), originalRowIndex: rowCount };
+          results.push(rowWithIndex);
+          // results.push(convertNumbers(data));
+          rowCount++;
+        } else {
+          stream.destroy();
+          resolve(results);
+        }
+      })
       .on("end", () => resolve(results))
       .on("error", (err) => reject(err));
   });
 };
 
-
-// Helper function to parse Excel
-const parseExcel = (fileBuffer) => {
-  
+const parseExcel = (fileBuffer, numOfRows) => {
   const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-
   const sheetNames = workbook.SheetNames;
+
   return sheetNames.reduce((sheets, sheetName) => {
+    let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
 
-    let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    let parsedData = [];
+    let rowCount = 0;
+    
+    const headers = sheetData[0]; // first row as header
 
-    // Convert numeric strings to numbers
-    sheetData = sheetData.map(convertNumbers);
+    for (let i = 1; i < sheetData.length; i++) {
+      if (numOfRows !== Infinity && rowCount >= numOfRows) break;
 
-    sheets[sheetName] = sheetData;
+      const row = convertNumbers(sheetData[i]);
+      const rowWithHeaders = headers.reduce((acc, header, index) => {
+        acc[header] = row[index];
+        return acc;
+      }, {});
+
+      rowWithHeaders.originalRowIndex = rowCount;
+      parsedData.push(rowWithHeaders);
+      rowCount++;
+    }
+
+    sheets[sheetName] = parsedData;
 
     return sheets;
   }, {});
-
 };
+
+
+// Helper function to parse CSV
+// const parseCSV = (fileBuffer, numOfRows) => {
+//   return new Promise((resolve, reject) => {
+//     const results = [];
+//     const stream = Readable.from(fileBuffer.toString("utf-8"));
+//     stream
+//       .pipe(csv())
+//       // .on("data", (data) => results.push(convertNumbers(data)))
+//       .on("data", (data) => {
+//         if (results.length < numOfRows) {
+//           results.push(convertNumbers(data));
+//         } else {
+//           stream.pause();
+//           resolve(results);
+//         }
+//       })
+//       .on("end", () => resolve(results))
+//       .on("error", (err) => reject(err));
+//   });
+// };
+
+
+// Helper function to parse Excel
+// const parseExcel = (fileBuffer) => {
+  
+//   const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+
+//   const sheetNames = workbook.SheetNames;
+//   return sheetNames.reduce((sheets, sheetName) => {
+
+//     let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+//     // Convert numeric strings to numbers
+//     sheetData = sheetData.map(convertNumbers);
+
+//     sheetData = sheetData.slice(0, numOfRows);
+
+//     sheets[sheetName] = sheetData;
+
+//     return sheets;
+//   }, {});
+
+// };
+

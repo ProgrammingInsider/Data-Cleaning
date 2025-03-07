@@ -3,20 +3,18 @@ import { BadRequestError, UnauthenticatedError, NotFoundError } from '../errors/
 import { queryDb } from "../DB_methods/query.js";
 import { generatePresignedUrl } from "../utils/generatePreSignedUrl.js";
 import { deleteFileFromS3 } from "../utils/deleteFromS3.js";
-import { 
-    frequency_penalty, 
-    max_completion_tokens, 
-    messages, 
-    presence_penalty, 
-    response_format, 
-    temperature, 
-    top_p } from "../openAI/schemaDefinition.js";
-import openai from "../config/openaiConfig.js";
 import { ParseS3File } from "../utils/ParseS3File.js";
+import { generateSchemaDefinition } from "../utils/generateSchemaDefinition.js";
+import { validateParsedData } from "../utils/validateParsedData.js";
 
 export const UploadFile = async(req,res,next) => {
     const { userId } = req.user;
     const { category, description } = req.body;
+
+    if (!userId) {
+        throw new UnauthenticatedError("User not authenticated.");
+    }
+    
 
     if(!category || !description){
         throw new BadRequestError("Please provide all required information.");
@@ -44,69 +42,34 @@ export const UploadFile = async(req,res,next) => {
         );
 
         if (userFiles.length === 0) {
-            return res.status(404).json({
-                status: false,
-                message: "No file found for the given user and file ID.",
-            });
+            throw new NotFoundError("No file found for the given user and file ID.");
         }
     
-        // const parsedData = await ParseS3File({ fileKey })
-        const parsedData = await ParseS3File({fileKey})
-
-        if (!parsedData || Object.keys(parsedData).length === 0) {
-            return res.status(400).json({ 
-                status: false, 
-                message: "Parsed data is invalid or empty" 
-            });
-        }
-
-        let records;
-        if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
-            const sheetName = Object.keys(parsedData)[0]; 
-            records = parsedData[sheetName];
-        } else {
-            records = parsedData;
-        }
-
-        const firstFiveRows = Array.isArray(records) ? records.slice(0, 1) : [];
-
-        const openAiPayload = {
-            model: "gpt-4o-mini",
-            messages: await messages(firstFiveRows),
-            max_tokens: max_completion_tokens,
-            temperature: temperature,
-            top_p: top_p,
-            frequency_penalty: frequency_penalty,
-            presence_penalty: presence_penalty,
-            response_format: response_format,
-        };
+        const parsedData = await ParseS3File({fileKey, numOfRows:1})
         
-        const response = await openai.chat.completions.create(openAiPayload);
-        const finalResponse = response.choices?.[0]?.message?.content;
-
-        let parsedResponse;
-        let schemaDefinition;
-        try {
-            parsedResponse = typeof finalResponse === "string" ? JSON.parse(finalResponse) : finalResponse;
-        } catch (error) {
-            console.error("Error parsing response JSON:", error);
+        if (!parsedData || Object.keys(parsedData).length === 0) {
+            throw new BadRequestError("Parsed data is invalid or empty");
         }
 
-        schemaDefinition = parsedResponse?.schema_definition;
-        console.log("Before AI actions inserted successfully. ",schemaDefinition);
+        let optimizedParsedData;
+    
+        if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
+            // Excel case: Extract the first sheet
+            const sheetName = Object.keys(parsedData)[0]; 
+            optimizedParsedData = parsedData[sheetName];
+        } else {
+            // CSV/JSON case: Use parsedData directly
+            optimizedParsedData = parsedData;
+        }
 
+        const schemaDefinition = generateSchemaDefinition(optimizedParsedData);
+        
         if ((schemaDefinition && Object.keys(schemaDefinition).length > 0)) {
             await queryDb(
                 `INSERT INTO FileSchemas (file_id, user_id, schema_definition) VALUES (?, ?, ?)`,
                 [userFiles[0].file_id, userId, JSON.stringify(schemaDefinition)]
             );
 
-        }else{
-
-            return res.status(200).json({ 
-                status: false, 
-                message: "The AI could not generate schema for the file.",
-            });
         }
 
         const fileSchemaDefinition = {
@@ -163,21 +126,54 @@ export const editSchema = async(req, res) => {
         throw new BadRequestError("Please provide all required information.");
     }
 
-    console.log(awareness);
-
     // INSERT USER INTO DATABASE
     const updateSchema = await queryDb(
         `UPDATE FileSchemas SET  schema_definition = ?, awareness = ? WHERE file_id = ? AND user_id = ?`,
         [JSON.stringify(schema_definition), awareness, file_id, userId]
     );
-
-    console.log(updateSchema);
     
     if(!updateSchema){
         throw new NotFoundError("No schema generated for this file, Please try again later!");
     }
     
     if(updateSchema.changedRows > 0){
+        const userFiles = await queryDb(
+            `SELECT file_id, file_key, original_name, category, description, progress, previous_response, file_schema FROM files WHERE file_id = ? AND user_id = ?`,
+            [file_id,userId]
+        );
+
+        const fileKey = userFiles[0].file_key;
+
+        const parsedData = await ParseS3File({fileKey, numOfRows:1})
+        
+        if (!parsedData || Object.keys(parsedData).length === 0) {
+            throw new BadRequestError("Parsed data is invalid or empty");
+        }
+
+        let optimizedParsedData;
+    
+        if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
+            // Excel case: Extract the first sheet
+            const sheetName = Object.keys(parsedData)[0]; 
+            optimizedParsedData = parsedData[sheetName];
+        } else {
+            // CSV/JSON case: Use parsedData directly
+            optimizedParsedData = parsedData;
+        }
+
+        const issues = validateParsedData(optimizedParsedData,schema_definition)
+        const insertValues = issues.map(issue => [
+            file_id, 
+            userId, 
+            issue.row, 
+            JSON.stringify(issue.errors)
+        ]);
+        
+        await queryDb(
+            `INSERT INTO issues (file_id, user_id, row_index, errors)
+                VALUES ?`,
+            [insertValues]
+        );
         return res.status(200).json({status:true, message:"Schema Updated Successfully"})
     }else{
         return res.status(200).json({status:false, message:"No change you have made."})
@@ -250,3 +246,37 @@ export const deleteFile = async (req, res) => {
         });
 };
 
+
+
+
+
+
+
+
+// const openAiPayload = {
+        //     model: "gpt-4o-mini",
+        //     messages: await messages(firstFiveRows),
+        //     max_tokens,
+        //     temperature,
+        //     top_p,
+        //     frequency_penalty,
+        //     presence_penalty,
+        //     response_format,
+        // };
+        
+        
+        // let parsedResponse;
+        // let schemaDefinition;
+        // try {
+        //     const response = await openai.chat.completions.create(openAiPayload);
+        //     const finalResponse = response.choices?.[0]?.message?.content;
+        //     parsedResponse = finalResponse ? JSON.parse(finalResponse) : null;
+        // } catch (error) {
+        //     console.error("Error parsing response JSON:", error);
+        // }
+
+        // if (!parsedResponse || !parsedResponse.schema_definition) {
+        //     throw new BadRequestError("OpenAI did not return a valid schema definition.");
+        // }
+
+        // schemaDefinition = parsedResponse?.schema_definition;
