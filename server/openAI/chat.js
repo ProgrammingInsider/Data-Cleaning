@@ -51,6 +51,8 @@ export const messages = async (userInput, schema, issues) => {
   - SUBSTRACTION_MULTIPLE_COLUMN: { type: "SUBSTRACTION_MULTIPLE_COLUMN", targetColumn: "<targetedColumnsArray>", update: "<changedColumn>" }
   - MULTIPLICATION_MULTIPLE_COLUMN: { type: "MULTIPLICATION_MULTIPLE_COLUMN", targetColumn: "<targetedColumnsArray>", update: "<changedColumn>" }
   - DIVIDE_MULTIPLE_COLUMN: { type: "DIVIDE_MULTIPLE_COLUMN", targetColumn: "<targetedColumnsArray>", update: "<changedColumn>" }
+  - CHANGE_SEPARATOR: { type: "CHANGE_SEPARATOR", issueType: "INVALID_SEPARATOR", column:"<ColumnName>", newSeparator:"<DateSeparator>" }
+  - CHANGE_DATE_FORMAT: { type: "CHANGE_DATE_FORMAT", issueType: "INVALID_FORMAT", column:"<ColumnName>", newFormat:"<DateFormat>"  }
 
   Your task is to generate an array of structured actions based on the provided schema. 
 
@@ -158,7 +160,9 @@ export const response_format = {
                   "ADDITION_MULTIPLE_COLUMN",
                   "SUBSTRACTION_MULTIPLE_COLUMN",
                   "MULTIPLICATION_MULTIPLE_COLUMN",
-                  "DIVIDE_MULTIPLE_COLUMN"
+                  "DIVIDE_MULTIPLE_COLUMN",
+                  "CHANGE_SEPARATOR",
+                  "CHANGE_DATE_FORMAT"
                 ] 
               },
               column: { type: "string", nullable: true },
@@ -173,7 +177,8 @@ export const response_format = {
               maxValue: { type: "number", nullable: true },
               count: { type: "number", nullable: true },
               title: { type: "string" },
-              response: { type: "string" }, 
+              response: { type: "string" },
+              newFormat: {type: "string", enum:["YYYY/MM/DD", "DD/MM/YYYY", "MM/DD/YYYY","YYYY-MM-DD", "DD-MM-YYYY", "MM-DD-YYYY"]}
               // targetColumn: { type: "array", items: { type: "string" }, nullable: true },
               // update: { type: "string", nullable: true },
               // by: { type: "string", nullable: true },

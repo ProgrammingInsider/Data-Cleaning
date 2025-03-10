@@ -52,6 +52,13 @@ const ColumnDataTypeDefinition = ({
                                     <option value="Email">Email</option>
                                     <option value="Boolean">Boolean</option>
                                     <option value="Date">Date</option>
+                                    <option value="UUID">UUID</option>
+                                    <option value="PhoneNumber">Phone Number</option>
+                                    <option value="Array">Array</option>
+                                    <option value="Object">Object</option>
+                                    <option value="Timestamp">Timestamp</option>
+                                    <option value="Currency">Currency</option>
+                                    <option value="Percentage">Percentage</option>
                                     <option value="All">Allow all types</option>
                                 </select>
                             </div>

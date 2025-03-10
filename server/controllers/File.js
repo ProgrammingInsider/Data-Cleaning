@@ -131,6 +131,7 @@ export const editSchema = async(req, res) => {
         `UPDATE FileSchemas SET  schema_definition = ?, awareness = ? WHERE file_id = ? AND user_id = ?`,
         [JSON.stringify(schema_definition), awareness, file_id, userId]
     );
+
     
     if(!updateSchema){
         throw new NotFoundError("No schema generated for this file, Please try again later!");
@@ -168,12 +169,14 @@ export const editSchema = async(req, res) => {
             issue.row, 
             JSON.stringify(issue.errors)
         ]);
+
+        if (insertValues.length > 0) {
+            await queryDb(
+                `INSERT INTO issues (file_id, user_id, row_index, errors) VALUES ?`,
+                [insertValues]
+            );
+        }
         
-        await queryDb(
-            `INSERT INTO issues (file_id, user_id, row_index, errors)
-                VALUES ?`,
-            [insertValues]
-        );
         return res.status(200).json({status:true, message:"Schema Updated Successfully"})
     }else{
         return res.status(200).json({status:false, message:"No change you have made."})

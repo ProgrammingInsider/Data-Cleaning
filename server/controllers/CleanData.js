@@ -68,27 +68,6 @@ export const CleanData = async (req, res) => {
     }
 
     // Construct schema dynamically from the first record
-    const firstRecord = records[0];
-    
-    // if (!userFiles[0].file_schema || Object.keys(userFiles[0].file_schema).length === 0){
-    //     schema = generatedSchema(firstRecord);
-        
-    //     // Update the database with the schema
-    //     // await queryDb(
-    //     //     `UPDATE files 
-    //     //     SET file_schema = ? 
-    //     //     WHERE file_id = ? AND user_id = ?`,
-    //     //     [JSON.stringify(schema), fileId, userId]
-    //     // );
-    // }else{
-    //     // schema = JSON.parse(userFiles[0].file_schema);
-    //     if (typeof userFiles[0].file_schema === "string") {
-    //         schema = JSON.parse(userFiles[0].file_schema);
-    //     } else {
-    //         schema = userFiles[0].file_schema; 
-    //     }
-    // }
-    
     if (!fileIssues || fileIssues.length === 0) {
         // issues = validateRecords(records, schema);
         const issues = validateParsedData(records,fetchSchema[0].schema_definition)
@@ -163,11 +142,8 @@ export const CleanData = async (req, res) => {
                 status: false, 
                 message: "The AI could not generate a meaningful response. Please try rephrasing or providing more details for better understanding.",
             });
-        }
-        
-        
+        }        
     }
-    
 
     // const actions = [
     //     { type: "DELETE_COLUMN", column: "LoyaltyPoints" },
@@ -175,6 +151,8 @@ export const CleanData = async (req, res) => {
     //     { type: "REMOVE_ROWS_WITH_ISSUES", issueType: "Null Value: Age" },
     //     { type: "REPLACE_NEGATIVE_VALUES", column: "Age", newValue: 20 },
     //     { type: "REPLACE_VALUE", column: "Name", oldValue: "", newValue: "Amanuel" },
+    // { type: "CHANGE_SEPARATOR", issueType: "INVALID_SEPARATOR", column:<ColumnName>, newSeparator:<DateSeparator> }
+    // { type: "CHANGE_DATE_FORMAT", issueType: "INVALID_FORMAT", column:<ColumnName>, newFormat:<DateFormat>  }
     //     { 
     //         type: "REPLACE_ROW", 
     //         rowNumber: 2, 
@@ -267,50 +245,10 @@ export const CleanData = async (req, res) => {
         [fileId,userId]
     );
 
-    // if(fileActions && fileActions.length > 0){
         const actions = fileActions.map(action => action.action_details);
-            records = manipulateData(records, actions, issues);
-            // schema = generatedSchema(records[0]);
-            // issues = validateRecords(records, generatedSchema(records[0]));
+            records = manipulateData(records, actions, issues,fetchSchema[0].schema_definition);
             issues = validateParsedData(records,fetchSchema[0].schema_definition);
             console.log("Third Issues ",issues.errors);
-
-
-    //     if (JSON.stringify(fileIssues) !== JSON.stringify(issues)) {
-    //         // Step 1: Delete existing issues for the file_id and user_id
-    //         await queryDb(
-    //             `DELETE FROM issues WHERE file_id = ? AND user_id = ?`,
-    //             [fileId, userId]
-    //         );
-        
-    //         // Step 2: Prepare the batch insert query
-    //         const insertValues = issues.issues.map(issue => [
-    //             fileId, 
-    //             userId, 
-    //             issue.row, 
-    //             JSON.stringify(issue.errors)
-    //         ]);
-        
-    //         // Step 3: Perform the batch insert in one query
-    //         // await queryDb(
-    //         //     `INSERT INTO issues (file_id, user_id, row_index, errors)
-    //         //      VALUES ?`,
-    //         //     [insertValues]
-    //         // );
-    //         if (!fileIssues && fileIssues.length === 0) {
-    //             await queryDb(
-    //                 `INSERT INTO issues (file_id, user_id, row_index, errors)
-    //                  VALUES ?`,
-    //                 [insertValues]
-    //             );
-    //         } else {
-    //             console.log('No issues to insert');
-    //         }
-            
-    //     // }
-        
-        
-    // }
 
     return res.status(200).json({ 
         status: true, 

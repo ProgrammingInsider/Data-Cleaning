@@ -13,11 +13,13 @@ import SmallLoading from '../SmallLoading';
 const DefineSchema = ({
     setShowOverlay, 
     schemaDefinition,
-    setStep
+    setStep,
+    step
 }:{
     setShowOverlay:React.Dispatch<boolean>,
     schemaDefinition:SchemaType | null,
-    setStep:React.Dispatch<number>
+    setStep:React.Dispatch<number>,
+    step:number
 }) => {
     const [loading, setLoading] = useState(false);
     const [loadingPage, setLoadingPage] = useState(false);
@@ -71,26 +73,55 @@ const DefineSchema = ({
                 :(
                     <form onSubmit={handleSave} method='POST' className='gap-8'>
                         <div className='flex flex-col gap-8 w-full p-6'>
-                            <div>
-                                    <label className='heading font-bold text-lg inline-block'>Tell us about the data <small className='para'>(recommended)</small></label>
-                                    <div className='mb-2'><small className='para'>The error detection and data cleaning functionality will be very high, if you provide some information about your data.</small></div>
-                                <textarea name='description' rows={5} placeholder='Explore more about the data purpose structure and benefits' className='w-full p-2 secondaryBg rounded-md focus:outline-none' value={awareness} onChange={(e)=>{setAwareness(e.target.value)}}>
-                                </textarea>
-                            </div>
-                            <label className='heading font-bold text-lg inline-block mb-2'>Define Columns Schema <small className='para'>(optional)</small></label>
-                            <ColumnDataTypeDefinition SchemaDefinition={schemaTypeDefinition} setSchemaDefinition={setSchemaTypeDefinition} setLoading={setLoading}/>
+                            {
+                                (step ===2) && (
+                                    <div>
+                                        <label className='heading font-bold text-lg inline-block'>Tell us about the data <small className='para'>(recommended)</small></label>
+                                        <div className='mb-2'><small className='para'>The error detection and data cleaning functionality will be very high, if you provide some information about your data.</small></div>
+                                        <textarea name='description' rows={5} placeholder='Explore more about the data purpose structure and benefits' className='w-full p-2 secondaryBg rounded-md focus:outline-none' value={awareness} onChange={(e)=>{setAwareness(e.target.value)}}>
+                                        </textarea>
+                                    </div>
+                                )
+                            }
+                            {
+                                (step === 3) && <>
+                                    <label className='heading font-bold text-lg inline-block mb-2'>Define Columns Schema <small className='para'>(optional)</small></label>
+                                    <ColumnDataTypeDefinition SchemaDefinition={schemaTypeDefinition} setSchemaDefinition={setSchemaTypeDefinition} setLoading={setLoading}/>
+                                </>
+                            }
 
                         </div>
                         {/* Form Buttons */}
                         <div className='flex gap-3 justify-end items-center pr-3 pb-3 border-t pt-3 sectionBg sticky bottom-0 shadow'>
-                            <button type='submit' className='secondaryBtn flex gap-3 items-center' onClick={()=>{setShowOverlay(false);setStep(1);}}>
+                            <button className='secondaryBtn flex gap-3 items-center' onClick={()=>{setShowOverlay(false);setStep(1);}}>
                                 Cancel
                             </button>
-                            <button type='submit' className='primaryBtn flex gap-3 items-center' disabled={loading}>
-                                {loading && (
-                                    <AiOutlineLoading3Quarters className='animate-spin text-xl' />
-                                )} Save
-                            </button>
+                            {
+                                (step === 3) && (
+                                    <button type='submit' className='transparentBtn flex gap-3 items-center' onClick={()=>setStep(2)}>
+                                        Back
+                                    </button>
+                                )
+                            }
+                            {
+                                (step === 3) && (
+                                    <button type='submit' className='primaryBtn flex gap-3 items-center' disabled={loading}>
+                                        {loading && (
+                                            <AiOutlineLoading3Quarters className='animate-spin text-xl' />
+                                        )} Save
+                                    </button>
+                                )
+                            }
+                            {
+                                (step === 2) && (
+                                    <button className='primaryBtn flex gap-3 items-center' disabled={loading} onClick={()=>setStep(3)}>
+                                        {loading && (
+                                            <AiOutlineLoading3Quarters className='animate-spin text-xl' />
+                                        )} Skip
+                                    </button>
+                                )
+                            }
+
                         </div>
 
                     </form>

@@ -1,9 +1,9 @@
 import { additionMultipleColumn, additionToColumn, deleteColumn, divideMultipleColumn, divisionColumn, fillMissing, multiplicationColumn, multiplicationMultipleColumn, renameColumn, replaceColumnValues, replaceNegativeValues, replaceValue, roundColumn, sortRowsAscending, sortRowsDescending, substractionMultipleColumn, subtractionFromColumn } from "../Actions/columnActions.js";
-import { fillWithAverage, fillWithMean, fillWithMedian, fillWithMode, fillWithRandom, fillWithUpperOrLowerRow, removeRowsWithAnyIssue, removeRowsWithColumnIssues, removeRowsWithIssues, removeRowsWithSpecificColumnIssue, removeRowsWithSpecificIssue, replaceIssueWithValue } from "../Actions/issuesActions.js";
+import { fillWithAverage, fillWithMean, fillWithMedian, fillWithMode, fillWithRandom, fillWithUpperOrLowerRow, removeRowsWithAnyIssue, removeRowsWithColumnIssues, removeRowsWithIssues, removeRowsWithSpecificColumnIssue, removeRowsWithSpecificIssue, replaceIssueWithValue, updateDateIssues } from "../Actions/issuesActions.js";
 import { deleteDuplicateRow, deleteRowsWhereValueEquals, deleteRowsWhereValueGreaterThan, deleteRowsWhereValueLessThan, deleteRowsWhereValueNotInRange, deleteRowsWithNegativeValues, keepOnlyUniqueRows, limitRows, removeEmptyRows, removeRowsWithNulls, replaceRow } from "../Actions/rowActions.js";
 
 
-export const manipulateData = (parsedData, actions, issues) => {
+export const manipulateData = (parsedData, actions, issues,schema) => {
     let modifiedData = [...parsedData];
     
     // Convert issues array to a row-based map for quick lookups
@@ -181,6 +181,15 @@ export const manipulateData = (parsedData, actions, issues) => {
 
             case "RENAME_COLUMN":
                 renameColumn(modifiedData, action)
+                break;
+            
+            // case "CHANGE_SEPARATOR":
+            case "CHANGE_DATE_FORMAT":
+                updateDateIssues(modifiedData, issuesMap, action,schema)
+                break;
+
+            case "CHANGE_SEPARATOR":
+                updateDateIssues(modifiedData, issuesMap, action,schema)
                 break;
                     
 
