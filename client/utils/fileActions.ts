@@ -4,7 +4,6 @@ import z, { ZodError } from 'zod';
 import { cookies } from "next/headers";
 import { AxiosError } from 'axios';
 import { SchemaType } from './types';
-// import { revalidatePath } from 'next/cache';
 
 type UploadResponse = {
     message: string | null;

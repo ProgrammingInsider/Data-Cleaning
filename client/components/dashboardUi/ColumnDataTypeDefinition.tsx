@@ -27,7 +27,9 @@ const ColumnDataTypeDefinition = ({
 
     return (
         <div className="w-full dataTypeColumnContainer">
-            {Object.keys(SchemaDefinition).map((key, index) => {
+            {Object.keys(SchemaDefinition)
+            .filter((key) => key !== "originalRowIndex")
+            .map((key, index) => {
                 const columnData = SchemaDefinition[key];
 
                 return (

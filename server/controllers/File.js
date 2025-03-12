@@ -250,36 +250,135 @@ export const deleteFile = async (req, res) => {
 };
 
 
+export const getIssue = async(req, res) => {
+    const {fileid} = req.query;
+    const { userId } = req.user;
 
+    if(!fileid && !userId){
+        throw new BadRequestError("Please provide all required information.");
+    }
 
+    // Fetch files from the database
+    const userFiles = await queryDb(
+        `SELECT file_id, file_key, original_name, category, description, progress, previous_response, file_schema FROM files WHERE file_id = ? AND user_id = ?`,
+        [fileid,userId]
+    );
 
+    console.log("userFiles ",userFiles);
+    
+    // Fetch issues from the database
+    const fileIssues = await queryDb(
+        `SELECT row_index, errors FROM issues WHERE file_id = ?`,
+        [fileid]
+    );
 
+    if (userFiles.length === 0) {
+        throw new NotFoundError("No file found for the given user and file ID.");
+    }
 
+    const fileKey = userFiles[0].file_key;
 
-// const openAiPayload = {
-        //     model: "gpt-4o-mini",
-        //     messages: await messages(firstFiveRows),
-        //     max_tokens,
-        //     temperature,
-        //     top_p,
-        //     frequency_penalty,
-        //     presence_penalty,
-        //     response_format,
-        // };
+    const parsedData = await ParseS3File({ fileKey })
+
+    if (!parsedData || Object.keys(parsedData).length === 0) {
+        throw new BadRequestError("Parsed data is invalid or empty");
+    }
+
+    let records;
+
+    if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
+        // Excel case: Extract the first sheet
+        const sheetName = Object.keys(parsedData)[0]; 
+        records = parsedData[sheetName];
+    } else {
+        // CSV/JSON case: Use parsedData directly
+        records = parsedData;
+    }
+
+    const distinctRowIndexes = new Set(fileIssues.map(issue => issue.row_index)).size;
+    const qualityScore = ((1 - (distinctRowIndexes / records.length)) * 100).toFixed(2);
+
+    // Group issues by issue type
+    const issuesByType = fileIssues.reduce((acc, issue) => {
+        issue.errors.forEach(error => {
+            if (!acc[error.issueType]) {
+                acc[error.issueType] = [];
+            }
+            acc[error.issueType].push({
+                row_index: issue.row_index,
+                column: error.column,
+                issueDesc: error.issueDesc
+            });
+        });
+        return acc;
+    }, {});
+
+    // Group issues by column
+    const columnWiseIssues = fileIssues.reduce((acc, issue) => {
+        issue.errors.forEach(error => {
+            if (!acc[error.column]) {
+                acc[error.column] = [];
+            }
+            acc[error.column].push({
+                row_index: issue.row_index,
+                issueDesc: error.issueDesc,
+                issueType: error.issueType
+            });
+        });
+        return acc;
+    }, {});
+
+    // Calculate total affected columns
+    const totalAffectedColumns = Object.keys(columnWiseIssues).length;
+    
+    // Define high-impact issue types
+    const highImpactIssueTypes = ["NULL_VALUE", "TYPE_MISMATCH", "INVALID_FORMAT"];
+    const highImpactIssues = fileIssues.reduce((count, issue) => {
+        return count + issue.errors.filter(error => highImpactIssueTypes.includes(error.issueType)).length;
+    }, 0);
+
+    // Prepare data for bar chart (column name vs total issues in that column)
+    const columnIssueCounts = Object.keys(columnWiseIssues).map(column => ({
+        column,
+        totalIssues: columnWiseIssues[column].length
+    }));
+
+    const impactLevels = {
+        "NULL_VALUE": "High",
+        "TYPE_MISMATCH": "High",
+        "INVALID_FORMAT": "Medium",
+        "INVALID_SEPARATOR": "Low",
+        "INVALID_VALUE": "Medium",
+        "DUPLICATE_VALUE": "Medium"
+    };
+
+    // Prepare data for issue type count chart with affected columns
+    const issueTypeCounts = Object.keys(issuesByType).map((issueType) => {
+        const totalCount = issuesByType[issueType].length;
+        const affectedRows = new Set(issuesByType[issueType].map(issue => issue.row_index)).size;
+
+        return {
+        issueType,
+        totalCount,
+        columns: [...new Set(issuesByType[issueType].map(issue => issue.column))], 
+        impact: impactLevels[issueType] || "Low",
+        affectedPercentage: Number(((affectedRows / records.length) * 100).toFixed(2) )
+    }});
+
+    return res.status(200).json({
+        status: true, 
+        original_name: userFiles[0].original_name, 
+        description: userFiles[0].description,
+        dataItems: records.length,
+        issueItems: fileIssues.length,
+        distinctIssueRows: distinctRowIndexes,
+        totalAffectedColumns, 
+        highImpactIssues, 
+        qualityScore: Number(qualityScore),
+        issuesByColumn: columnWiseIssues,
+        issuesByType,
+        columnIssueCounts, 
+        issueTypeCounts 
+    });
+}
         
-        
-        // let parsedResponse;
-        // let schemaDefinition;
-        // try {
-        //     const response = await openai.chat.completions.create(openAiPayload);
-        //     const finalResponse = response.choices?.[0]?.message?.content;
-        //     parsedResponse = finalResponse ? JSON.parse(finalResponse) : null;
-        // } catch (error) {
-        //     console.error("Error parsing response JSON:", error);
-        // }
-
-        // if (!parsedResponse || !parsedResponse.schema_definition) {
-        //     throw new BadRequestError("OpenAI did not return a valid schema definition.");
-        // }
-
-        // schemaDefinition = parsedResponse?.schema_definition;

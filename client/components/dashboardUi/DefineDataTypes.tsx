@@ -66,18 +66,18 @@ const DefineSchema = ({
     }
 
     return (
-        <div className='sectionBg full rounded-lg'>
+        <div className='sectionBg w-full rounded-lg'>
             {
                 loadingPage
                 ? <SmallLoading/>
                 :(
-                    <form onSubmit={handleSave} method='POST' className='gap-8'>
+                    <form onSubmit={handleSave} method='POST' className='w-full gap-8'>
                         <div className='flex flex-col gap-8 w-full p-6'>
                             {
                                 (step ===2) && (
                                     <div>
-                                        <label className='heading font-bold text-lg inline-block'>Tell us about the data <small className='para'>(recommended)</small></label>
-                                        <div className='mb-2'><small className='para'>The error detection and data cleaning functionality will be very high, if you provide some information about your data.</small></div>
+                                        <label className='heading font-bold text-lg inline-block'>Tell us about the data <small className='para text-green-600'>(recommended)</small></label>
+                                        <div className='mb-2'><small className='para'>Providing data details enhances error detection and cleaning.</small></div>
                                         <textarea name='description' rows={5} placeholder='Explore more about the data purpose structure and benefits' className='w-full p-2 secondaryBg rounded-md focus:outline-none' value={awareness} onChange={(e)=>{setAwareness(e.target.value)}}>
                                         </textarea>
                                     </div>
@@ -117,7 +117,7 @@ const DefineSchema = ({
                                     <button className='primaryBtn flex gap-3 items-center' disabled={loading} onClick={()=>setStep(3)}>
                                         {loading && (
                                             <AiOutlineLoading3Quarters className='animate-spin text-xl' />
-                                        )} Skip
+                                        )} Next
                                     </button>
                                 )
                             }

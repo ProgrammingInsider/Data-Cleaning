@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { ColumnProblem } from "@/utils/types"
+import { ColumnIssueType } from "@/utils/types"
 
 import {
   Card,
@@ -21,7 +21,7 @@ import {
 
 const chartConfig = {} satisfies ChartConfig
 
-function BarChartComponent({ columnProblemCount }: { columnProblemCount: ColumnProblem[] }) {
+function BarChartComponent({ columnIssueCounts }: { columnIssueCounts: ColumnIssueType[] }) {
 
   return (
     <Card className="w-full">
@@ -40,7 +40,7 @@ function BarChartComponent({ columnProblemCount }: { columnProblemCount: ColumnP
         >
           <BarChart
             accessibilityLayer
-            data={columnProblemCount}
+            data={columnIssueCounts}
             margin={{
               left: 12,
               right: 12,
@@ -59,13 +59,13 @@ function BarChartComponent({ columnProblemCount }: { columnProblemCount: ColumnP
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
-                  nameKey="numberOfProblems"
+                  nameKey="totalIssues"
                   labelFormatter={(value) => value}
                 />
               }
             />
           
-            <Bar dataKey="numberOfProblems" fill="hsl(var(--chart-1))" />
+            <Bar dataKey="totalIssues" fill="hsl(var(--chart-1))" />
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -1,8 +1,6 @@
 import { queryDb } from "../DB_methods/query.js";
-import { generatedSchema } from "../utils/generateSchema.js";
 import { manipulateData } from "../utils/manipulateData .js";
 import { ParseS3File } from "../utils/ParseS3File.js";
-import { validateRecords } from "../utils/validateRecords.js";
 import { 
     frequency_penalty, 
     max_completion_tokens, 
@@ -50,7 +48,6 @@ export const CleanData = async (req, res) => {
     }
 
     let records;
-    // let schema;
     let issues;
     let aiResponse;
     
@@ -69,7 +66,6 @@ export const CleanData = async (req, res) => {
 
     // Construct schema dynamically from the first record
     if (!fileIssues || fileIssues.length === 0) {
-        // issues = validateRecords(records, schema);
         const issues = validateParsedData(records,fetchSchema[0].schema_definition)
         const insertValues = issues.map(issue => [
             fileId, 

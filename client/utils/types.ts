@@ -17,6 +17,18 @@ export interface ColumnProblem {
   numberOfProblems: number;
 }
 
+export interface IssueCountType {
+  issueType:string;
+  totalCount:number; 
+  columns:string[];
+  impact:string;
+  affectedPercentage:number;
+};
+export interface ColumnIssueType {
+  column:string;
+  totalIssues:number;
+};
+
 export interface ErrorDetectionType {
   DataInconsistency: string;
   DetectionStatus: number;
@@ -77,13 +89,13 @@ export interface Schema {
 }
 
 export interface schemaTypeDefinition {
-  "dataType": string;
-  "unique": boolean;
-  "numericSign": string | null;
-  "precision": number | null;
-  "format": string | null;
-  "separator": string | null;
-  "desc": string | null;
+  dataType: string;
+  unique: boolean;
+  numericSign: string | null;
+  precision: number | null;
+  format: string | null;
+  separator: string | null;
+  desc: string | null;
 }
 
 export interface SchemaDefinition {
@@ -91,8 +103,20 @@ export interface SchemaDefinition {
 }
 
 export interface SchemaType {
-  // user_id: string;
+  schema_id?: string;
+  user_id?: string;
   file_id: string;
   schema_definition: SchemaDefinition;
   awareness: string;
+  created_at?: string;
+  updated_at?: string;
 } 
+
+export interface computeDataType {
+  issueDistribution: IssueDistributionType[],
+  sortedColumnProblemCount: ColumnProblem[],
+  totalIssues: number,
+  highImpactCount: number,
+  totalPercentage: number,
+  totalDistinctColumns: number,
+}

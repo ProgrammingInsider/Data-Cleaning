@@ -286,9 +286,6 @@ export function validateParsedData(parsedData, schemaDefinition) {
                 const expectedSeparator = schema.separator; // e.g., "/"
                 const expectedFormat = schema.format.replace(/[-/.]/g, expectedSeparator);  // e.g., "YYYY-MM-DD"
                 
-                console.log("expectedFormat ",expectedFormat);
-                console.log("expectedSeparator ",expectedSeparator);
-                
                 const valueSeparator = value.replace(/\d/g, "")[0];  // Extract first non-digit character
             
                 if (expectedFormat && expectedSeparator) {

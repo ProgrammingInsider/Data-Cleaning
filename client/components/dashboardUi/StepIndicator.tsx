@@ -9,7 +9,7 @@ const StepIndicator = ({step}:{step:number}) => {
               <p className="para text-center font-medium text-nowrap text-sm">Upload File</p>
 
           </div>
-          <div className={`w-full relative h-2 rounded-full ${(step === 1 || step === 2 || step === 3) ? "primaryBg" :"secondaryBg"}`}></div>
+          <div className={`w-full relative h-2 rounded-full ${(step === 2 || step === 3) ? "primaryBg" :"secondaryBg"}`}></div>
           <div className="flex flex-col gap-1 justify-center items-center transparent">
               <h1 className={`p-1 text-base font-bold w-6 h-6 rounded-full flex justify-center items-center -ml-1 z-10 ${(step === 2 || step === 3) ? "primaryBg" :"secondaryBg"}`}>2</h1>
               <p className="para text-center font-medium text-nowrap text-sm w-full">About the data</p>
@@ -26,7 +26,7 @@ const StepIndicator = ({step}:{step:number}) => {
             <p className="para text-center font-medium text-nowrap text-sm">Upload File</p>
             <p className="para text-center font-medium text-nowrap text-sm">Schema Definition</p>
         </div> */}
-        {step === 2 && <small className='para text-xs'>This schema type definition is option. You can modify anytime you want. For better error detections and data cleaning performance it is highly recommended to define schema properly at the beginning.</small>}
+        {step === 2 && <small className='para text-xs'>Schema definition is optional but recommended for better error detection and cleaning.</small>}
     </header>
   )
 }
