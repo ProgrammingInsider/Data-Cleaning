@@ -28,7 +28,6 @@ export const GetSchema = async (fileId:string) => {
 export const GetIssues = async (fileId:string) => {
     const cookieStore = await cookies();
     const accessTokenCookie = cookieStore.get("accessToken")?.value;
-    console.log("fileId ",fileId);
     
     try{
         
@@ -37,7 +36,6 @@ export const GetIssues = async (fileId:string) => {
                 Authorization: `Bearer ${accessTokenCookie}`, 
             },
         });
-        console.log("data ",data);
         
         return data;
     }catch(error){

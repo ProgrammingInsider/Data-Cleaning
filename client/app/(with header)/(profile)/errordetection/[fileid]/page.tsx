@@ -16,8 +16,6 @@ import Status from '@/components/errorDetectionUi/Status'
 import SchemaDefinitionTable from '@/components/errorDetectionUi/SchemaDefinitionTable'
 import { GetIssues } from '@/utils/errorDetectionActions'
 
-
-
 const ErrorDetection = ({params}:Props) => {
   
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +89,7 @@ const ErrorDetection = ({params}:Props) => {
               <CardDescription>Detailed breakdown of data quality issues</CardDescription>
             </CardHeader>
             <CardContent>
-              <IssueTable issueTypeCounts={issueTypeCounts} />
+              <IssueTable issueTypeCounts={issueTypeCounts} fileId={fileId} />
             </CardContent>
           </Card>
 
@@ -105,7 +103,7 @@ const ErrorDetection = ({params}:Props) => {
               }}
               data-ignore="true"
             >
-            <Link href={`/cleandata/${fileId}`}><BsStars />Clean Data</Link>
+            <Link href={`/cleandata/${fileId}`} target='_blank'><BsStars />Clean Data</Link>
             </Button>
             <ExportDropdown/>
           </div>

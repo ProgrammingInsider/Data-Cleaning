@@ -10,10 +10,10 @@ import {
   } from "@/components/ui/table"
 
   import {IssueCountType} from '@/utils/types'
+import Link from "next/link";
 import { useState } from "react";
 
-
-function IssueTable({issueTypeCounts}:{issueTypeCounts:IssueCountType[]}) {
+function IssueTable({issueTypeCounts, fileId}:{issueTypeCounts:IssueCountType[], fileId:string}) {
     const [showModal, setShowModal] = useState(-1);
     return (
         <Table>
@@ -37,15 +37,15 @@ function IssueTable({issueTypeCounts}:{issueTypeCounts:IssueCountType[]}) {
                 <TableCell className="text-right flex gap-2 flex-wrap justify-end">
                 {
                     error.columns.slice(0,2).map((column,errorIndex) => (
-                        <div key={errorIndex} className="rounded-lg bg-red-400 p-1 m-1 inline-block" style={{ verticalAlign: 'middle' }}>
+                        <Link href={`/cleandata/${fileId}`} target="_blank" key={errorIndex} className="rounded-lg bg-red-400 p-1 m-1 inline-block" style={{ verticalAlign: 'middle' }}>
                             {column}{errorIndex !== error.columns.length-1?' ':''}
-                        </div>
+                        </Link>
                 ))}
                 {
                     ( showModal === index && error.columns.slice(2).map((column,errorIndex) => (
-                        <span key={errorIndex}  className="rounded-lg bg-red-400 p-1 m-1 inline-block" style={{ verticalAlign: 'middle' }}>
+                        <Link href={`/cleandata/${fileId}`} target="_blank" key={errorIndex}  className="rounded-lg bg-red-400 p-1 m-1 inline-block" style={{ verticalAlign: 'middle' }}>
                             {column}{errorIndex !== error.columns.length-1?' ':''}
-                        </span>)
+                        </Link>)
                 ))}
                     {(error.columns.length > 2) && 
                     (

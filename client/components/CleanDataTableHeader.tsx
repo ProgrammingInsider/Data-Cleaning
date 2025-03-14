@@ -11,6 +11,9 @@ import { FaRegWindowClose } from "react-icons/fa";
 import { useState } from "react";
 import Link from "next/link";
 
+const COLORS = {INVALID_VALUE:"#FF5733",TYPE_MISMATCH:"#FFC300",NULL_VALUE:"#36A2EB",DUPLICATE_VALUE:"#4CAF50",INVALID_FORMAT:"#9C27B0",INVALID_SEPARATOR:"#FF9800",INVALID_DATE: "#E53935"}
+
+
 const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React.Dispatch<React.SetStateAction<boolean>>}) => {
     const [row, setRow] = useState<number | string>(50)
 
@@ -30,6 +33,19 @@ const CleanDataTableHeader = ({expand,setExpand}:{expand:boolean,setExpand:React
                 <input type="text" value={row} onChange={(e)=>setRow(e.target.value)} min={0} className='w-14 bg-transparent border text-sm border-gray-400 rounded-md focus:outline-none' /><FaAngleRight onClick={()=>handlePagination(true)} className="cursor-pointer" />
                 </span>
         </div>
+        {/* grid-cols-3 */}
+        <ul className="grid grid-cols-4 gap-1 md:hidden lg:grid">
+            {Object.entries(COLORS).map(([key, value]) => (
+                <li key={key} className="flex items-center gap-1">
+                    <span className="min-w-4 min-h-4 rounded" style={{ backgroundColor: value }}></span>
+                    <span className="text-[10px]">{key}</span>
+                </li>
+            ))}
+        </ul>
+
+
+        
+
 
         <div className='flex justify-between items-center gap-3'>
             <IoMdShare className="cursor-pointer" />
