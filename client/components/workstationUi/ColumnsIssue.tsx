@@ -14,6 +14,8 @@ interface IssuesData {
     [column: string]: Issue[];
 }
 
+const COLORS = {INVALID_VALUE:"#FF5733",TYPE_MISMATCH:"#FFC300",NULL_VALUE:"#36A2EB",DUPLICATE_VALUE:"#4CAF50",INVALID_FORMAT:"#9C27B0",INVALID_SEPARATOR:"#FF9800",INVALID_DATE: "#E53935"}
+
 const ColumnsIssue = () => {
     const [isIssueOpen, setIsIssueOpen] = useState<boolean>(false);
     const [expandedColumns, setExpandedColumns] = useState<Record<string, boolean>>({});
@@ -75,13 +77,19 @@ const ColumnsIssue = () => {
                     {expandedColumns[column] && (
                     <ul className="ml-5 mt-1 text-xs space-y-1">
                         {issues.map(({ row, issueType }, i) => (
-                        <li
-                            key={i}
-                            className="cursor-pointer hover:underline"
-                            onClick={() => setSelectedRow(row)}
-                        >
-                            Row {row}: {issueType}
-                        </li>
+                        <div key={i} className="flex gap-1">
+                            <div 
+                            className="min-w-4 min-h-4 rounded" 
+                            style={{ backgroundColor: COLORS[issueType as keyof typeof COLORS] }} 
+                            ></div>
+                            <li
+                                key={i}
+                                className="cursor-pointer text-nowrap hover:underline"
+                                onClick={() => setSelectedRow(row)}
+                            >
+                                Row {row}: {issueType}
+                            </li>
+                        </div>
                         ))}
                     </ul>
                     )}
