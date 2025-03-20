@@ -7,19 +7,29 @@ import { Table, TableHeader, TableBody, TableHead, TableRow , TableCell} from '.
 
 
 const SchemaDefinitionTable = ({fileId}:{fileId:string}) => {
-    const [schema, setSchema] = useState<SchemaType>();
+  
+  const [schema, setSchema] = useState<SchemaType>();
+  const [loading, setLoading] = useState<boolean>(false);
   
   useEffect(()=>{
+    setLoading(true);
     const fetchSchema = async() => {
       const resp = await GetSchema(fileId);
       setSchema(resp.result[0]);
+      setLoading(false);
     }
     if(fileId){
       fetchSchema();
     }
   },[fileId]);
 
-  if (!schema) return <p>No schema found.</p>;
+    if (!schema || loading) {
+        return <p>Loading...</p>;
+    }
+    
+    if(schema.schema_definition === null){
+        return <p>No schema found.</p>;
+    }
 
   
 

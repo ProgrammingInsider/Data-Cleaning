@@ -6,6 +6,9 @@ import { deleteFileFromS3 } from "../utils/deleteFromS3.js";
 import { ParseS3File } from "../utils/ParseS3File.js";
 import { generateSchemaDefinition } from "../utils/generateSchemaDefinition.js";
 import { validateParsedData } from "../utils/validateParsedData.js";
+import { getRecordsFromCache } from "../utils/getRecordsFromCache.js";
+import { setRecordsOnCache } from "../utils/setRecordsOnCache.js";
+import { extractDataFromParsedFile } from "../utils/extractDataFromParsedFile.js";
 
 export const UploadFile = async(req,res,next) => {
     const { userId } = req.user;
@@ -45,7 +48,7 @@ export const UploadFile = async(req,res,next) => {
             throw new NotFoundError("No file found for the given user and file ID.");
         }
     
-        const parsedData = await ParseS3File({fileKey, numOfRows:1})
+        const parsedData = await ParseS3File({fileKey})
         
         if (!parsedData || Object.keys(parsedData).length === 0) {
             throw new BadRequestError("Parsed data is invalid or empty");
@@ -53,14 +56,9 @@ export const UploadFile = async(req,res,next) => {
 
         let optimizedParsedData;
     
-        if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
-            // Excel case: Extract the first sheet
-            const sheetName = Object.keys(parsedData)[0]; 
-            optimizedParsedData = parsedData[sheetName];
-        } else {
-            // CSV/JSON case: Use parsedData directly
-            optimizedParsedData = parsedData;
-        }
+        optimizedParsedData = extractDataFromParsedFile(parsedData);
+
+        await setRecordsOnCache(optimizedParsedData, userId, userFiles[0].file_id);
 
         const schemaDefinition = generateSchemaDefinition(optimizedParsedData);
         
@@ -69,14 +67,12 @@ export const UploadFile = async(req,res,next) => {
                 `INSERT INTO FileSchemas (file_id, user_id, schema_definition) VALUES (?, ?, ?)`,
                 [userFiles[0].file_id, userId, JSON.stringify(schemaDefinition)]
             );
-
         }
 
         const fileSchemaDefinition = {
             file_id: userFiles[0].file_id,
             schema_definition: schemaDefinition
         }
-
 
         return res
                 .status(201)
@@ -153,14 +149,7 @@ export const editSchema = async(req, res) => {
 
         let optimizedParsedData;
     
-        if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
-            // Excel case: Extract the first sheet
-            const sheetName = Object.keys(parsedData)[0]; 
-            optimizedParsedData = parsedData[sheetName];
-        } else {
-            // CSV/JSON case: Use parsedData directly
-            optimizedParsedData = parsedData;
-        }
+        optimizedParsedData = extractDataFromParsedFile(parsedData);
 
         const issues = validateParsedData(optimizedParsedData,schema_definition)
         const insertValues = issues.map(issue => [
@@ -206,21 +195,6 @@ export const getUserFiles = async (req, res) => {
         message: "Fetched successfully", 
         result:userFiles 
     });
-
-    // Generate pre-signed URLs for each file
-    // const filesWithUrls = await Promise.all(
-    //     userFiles.map(async (file) => ({
-    //         fileId: file.id,
-    //         originalName: file.original_name,
-    //         category: file.category,
-    //         description: file.description,
-    //         fileType: file.file_type,
-    //         fileSize: file.file_size,
-    //         fileUrl: await generatePresignedUrl(file.file_key),
-    //     }))
-    // );
-
-    // res.status(200).json({ files: filesWithUrls });
 };
 
 export const deleteFile = async (req, res) => {
@@ -258,48 +232,45 @@ export const getIssue = async(req, res) => {
         throw new BadRequestError("Please provide all required information.");
     }
 
+    let records = await getRecordsFromCache(userId, fileid);
+
     // Fetch files from the database
     const userFiles = await queryDb(
-        `SELECT file_id, file_key, original_name, category, description, progress, previous_response, file_schema FROM files WHERE file_id = ? AND user_id = ?`,
+        `SELECT file_id, file_key, original_name, category, description, progress FROM files WHERE file_id = ? AND user_id = ?`,
         [fileid,userId]
-    );
-
-    console.log("userFiles ",userFiles);
-    
-    // Fetch issues from the database
-    const fileIssues = await queryDb(
-        `SELECT row_index, errors FROM issues WHERE file_id = ?`,
-        [fileid]
     );
 
     if (userFiles.length === 0) {
         throw new NotFoundError("No file found for the given user and file ID.");
     }
 
-    const fileKey = userFiles[0].file_key;
-
-    const parsedData = await ParseS3File({ fileKey })
-
-    if (!parsedData || Object.keys(parsedData).length === 0) {
-        throw new BadRequestError("Parsed data is invalid or empty");
+    const fetchSchema = await queryDb(
+        `SELECT schema_definition FROM FileSchemas WHERE file_id = ? AND user_id = ?`,
+        [fileid,userId]
+    );
+    
+    if(!records){
+        console.log("Records not found in cache, fetching from S3");
+        
+        const fileKey = userFiles[0].file_key;
+    
+        const parsedData = await ParseS3File({ fileKey })
+    
+        if (!parsedData || Object.keys(parsedData).length === 0) {
+            throw new BadRequestError("Parsed data is invalid or empty");
+        }
+        
+        records = extractDataFromParsedFile(parsedData);
+        await setRecordsOnCache(records, userId, fileid);
     }
 
-    let records;
+    const issues = validateParsedData(records,fetchSchema[0].schema_definition)
 
-    if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
-        // Excel case: Extract the first sheet
-        const sheetName = Object.keys(parsedData)[0]; 
-        records = parsedData[sheetName];
-    } else {
-        // CSV/JSON case: Use parsedData directly
-        records = parsedData;
-    }
-
-    const distinctRowIndexes = new Set(fileIssues.map(issue => issue.row_index)).size;
+    const distinctRowIndexes = new Set(issues.map(issue => issue.row_index)).size;
     const qualityScore = ((1 - (distinctRowIndexes / records.length)) * 100).toFixed(2);
 
     // Group issues by issue type
-    const issuesByType = fileIssues.reduce((acc, issue) => {
+    const issuesByType = issues.reduce((acc, issue) => {
         issue.errors.forEach(error => {
             if (!acc[error.issueType]) {
                 acc[error.issueType] = [];
@@ -314,7 +285,7 @@ export const getIssue = async(req, res) => {
     }, {});
 
     // Group issues by column
-    const columnWiseIssues = fileIssues.reduce((acc, issue) => {
+    const columnWiseIssues = issues.reduce((acc, issue) => {
         issue.errors.forEach(error => {
             if (!acc[error.column]) {
                 acc[error.column] = [];
@@ -333,7 +304,7 @@ export const getIssue = async(req, res) => {
     
     // Define high-impact issue types
     const highImpactIssueTypes = ["NULL_VALUE", "TYPE_MISMATCH", "INVALID_FORMAT"];
-    const highImpactIssues = fileIssues.reduce((count, issue) => {
+    const highImpactIssues = issues.reduce((count, issue) => {
         return count + issue.errors.filter(error => highImpactIssueTypes.includes(error.issueType)).length;
     }, 0);
 
@@ -367,10 +338,11 @@ export const getIssue = async(req, res) => {
 
     return res.status(200).json({
         status: true, 
+        records: records.slice(0, 5),
         original_name: userFiles[0].original_name, 
         description: userFiles[0].description,
         dataItems: records.length,
-        issueItems: fileIssues.length,
+        issueItems: issues.length,
         distinctIssueRows: distinctRowIndexes,
         totalAffectedColumns, 
         highImpactIssues, 

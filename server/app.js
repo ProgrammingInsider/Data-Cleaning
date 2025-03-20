@@ -32,6 +32,7 @@ import { privateAuth } from './middleware/privateAuth.js';
 // Config
 import corsOptions from './config/corsOptions.js';
 import { Db_connection } from './DB/db.js';
+// import { connectRedis } from './config/redis.js';
 
 // Security Middleware
 app.use(helmet());

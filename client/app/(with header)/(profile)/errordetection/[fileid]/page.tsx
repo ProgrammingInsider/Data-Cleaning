@@ -15,9 +15,11 @@ import Summary from '@/components/errorDetectionUi/Summary'
 import Status from '@/components/errorDetectionUi/Status'
 import SchemaDefinitionTable from '@/components/errorDetectionUi/SchemaDefinitionTable'
 import { GetIssues } from '@/utils/errorDetectionActions'
+import DatasetSample from '@/components/errorDetectionUi/DatasetSample'
 
 const ErrorDetection = ({params}:Props) => {
   
+  const[swithSection, setSwithSection] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [fileId, setFileId] = useState<string>("");
   const [qualityScore, setQualityScore] = useState<number>(0);
@@ -27,6 +29,7 @@ const ErrorDetection = ({params}:Props) => {
   const [issueTypeCounts, setIssueTypeCounts] = useState<IssueCountType[]>([]);
   const [originalName, setOriginalName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [records, setRecords] = useState<Record<string,number | string | null | boolean>[]>([]);
 
   useEffect(() => {
     
@@ -39,7 +42,7 @@ const ErrorDetection = ({params}:Props) => {
             setFileId(fileid);
             try {
                 const resp = await GetIssues(fileid);
-                setTotalAffectedColumns(resp.totalAffectedColumns)
+                setTotalAffectedColumns(resp.totalAffectedColumns);
                 setQualityScore(resp.qualityScore);
                 setHighImpactIssues(resp.highImpactIssues)
                 setColumnIssueCounts(resp.columnIssueCounts)
@@ -47,6 +50,7 @@ const ErrorDetection = ({params}:Props) => {
                 setIssueTypeCounts(resp.issueTypeCounts);
                 setOriginalName(resp.original_name);
                 setDescription(resp.description)
+                setRecords(resp.records)
                 
             } catch (error) {
                 console.error('Unexpected error:', error);
@@ -80,7 +84,16 @@ const ErrorDetection = ({params}:Props) => {
           </div>
 
           <Card className='w-full'>
-            <SchemaDefinitionTable fileId={fileId}/>
+            <div className='p-4 flex gap-2'>
+              <Button className={`border border-white hover:bg-transparent hover:text-white ${(swithSection === 1) ? "bg-transparent text-white" : "primaryBtn primaryBtnText"}`} onClick={()=>setSwithSection(1)}>Schema Definition</Button>
+              <Button className={`border border-white hover:bg-transparent hover:text-white ${(swithSection === 2) ? "bg-transparent text-white" : "primaryBtn primaryBtnText"}`} onClick={()=>setSwithSection(2)}>Dataset Sample</Button>
+            </div>
+          <div className="w-full relative max-h-[500px] overflow-auto custom-scrollbar">
+            <div className='p-4'>
+              {(swithSection === 1) && <SchemaDefinitionTable fileId={fileId}/> }
+              {(swithSection === 2) && <DatasetSample records={records}/>}
+            </div>
+          </div>
           </Card>
 
           <Card className='w-full'>

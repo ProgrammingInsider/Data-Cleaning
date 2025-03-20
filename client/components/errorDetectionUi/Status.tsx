@@ -6,7 +6,8 @@ import { PiWarningCircleLight } from "react-icons/pi";
 import { IoCloseCircleOutline } from "react-icons/io5";
 
 const Status = ({totalAffectedColumns, highImpactIssues, issueTypeCounts}:{totalAffectedColumns:number, highImpactIssues:number, issueTypeCounts:IssueCountType[]}) => {
-  return (
+  console.log({totalAffectedColumns, highImpactIssues, issueTypeCounts})
+    return (
         <div className='flex flex-col gap-3 sm:flex-row'>
             <Card className='w-full sectionBg border-0'>
             <CardHeader className='flex flex-row items-center justify-between'>

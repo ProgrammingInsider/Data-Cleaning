@@ -12,57 +12,56 @@ import {
 import openai from "../config/openaiConfig.js";
 import {BadRequestError, NotFoundError} from "../errors/index.js";
 import { validateParsedData } from "../utils/validateParsedData.js";
+import { setRecordsOnCache } from "../utils/setRecordsOnCache.js";
+import { getRecordsFromCache } from "../utils/getRecordsFromCache.js";
+import { extractDataFromParsedFile } from "../utils/extractDataFromParsedFile.js";
 
 export const CleanData = async (req, res) => {
     const { userId } = req.user;
     const { fileId, chat } = req.body;
     
-    // Fetch files from the database
-    const userFiles = await queryDb(
-        `SELECT file_id, file_key, original_name, category, description, progress, previous_response, file_schema FROM files WHERE file_id = ? AND user_id = ?`,
-        [fileId,userId]
-    );
+    let records = await getRecordsFromCache(userId, fileId)
 
-    // Fetch issues from the database
-    const fileIssues = await queryDb(
-        `SELECT row_index, errors FROM issues WHERE file_id = ?`,
-        [fileId]
-    );
-    
-    // Fetch schema from the database
-    const fetchSchema = await queryDb(
-        `SELECT schema_definition FROM FileSchemas WHERE file_id = ? AND user_id = ?`,
-        [fileId,userId]
-    );
+    // Fetch data from the database concurrently
+    const [userFiles, fileIssues, fetchSchema] = await Promise.all([
+        queryDb(
+            `SELECT file_key FROM files WHERE file_id = ? AND user_id = ?`,
+            [fileId, userId]
+        ),
+        queryDb(
+            `SELECT row_index, errors FROM issues WHERE file_id = ?`,
+            [fileId]
+        ),
+        queryDb(
+            `SELECT schema_definition FROM FileSchemas WHERE file_id = ? AND user_id = ?`,
+            [fileId, userId]
+        )
+    ]);
 
     if (userFiles.length === 0) {
         throw new NotFoundError("No file found for the given user and file ID.");
     }
+    
+    if(!records){
+        
+        const fileKey = userFiles[0].file_key;
+    
+        const parsedData = await ParseS3File({ fileKey })
+    
+        if (!parsedData || Object.keys(parsedData).length === 0) {
+            throw new BadRequestError("Parsed data is invalid or empty");
+        }
 
-    const fileKey = userFiles[0].file_key;
+        records = extractDataFromParsedFile(parsedData);
+        await setRecordsOnCache(records, userId, fileId);
 
-    const parsedData = await ParseS3File({ fileKey })
-
-    if (!parsedData || Object.keys(parsedData).length === 0) {
-        throw new BadRequestError("Parsed data is invalid or empty");
+        if (!Array.isArray(records) || records.length === 0) {
+            throw new BadRequestError("No valid data found" );
+        }
     }
-
-    let records;
+    
     let issues;
     let aiResponse;
-    
-    if (typeof parsedData === "object" && !Array.isArray(parsedData)) {
-        // Excel case: Extract the first sheet
-        const sheetName = Object.keys(parsedData)[0]; 
-        records = parsedData[sheetName];
-    } else {
-        // CSV/JSON case: Use parsedData directly
-        records = parsedData;
-    }
-
-    if (!Array.isArray(records) || records.length === 0) {
-        throw new BadRequestError("No valid data found" );
-    }
 
     // Construct schema dynamically from the first record
     if (!fileIssues || fileIssues.length === 0) {
@@ -241,10 +240,9 @@ export const CleanData = async (req, res) => {
         [fileId,userId]
     );
 
-        const actions = fileActions.map(action => action.action_details);
-            records = manipulateData(records, actions, issues,fetchSchema[0].schema_definition);
-            issues = validateParsedData(records,fetchSchema[0].schema_definition);
-            console.log("Third Issues ",issues.errors);
+    const actions = fileActions.map(action => action.action_details);
+    records = manipulateData(records, actions, issues,fetchSchema[0].schema_definition);
+    issues = validateParsedData(records,fetchSchema[0].schema_definition);
 
     return res.status(200).json({ 
         status: true, 
